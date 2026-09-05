@@ -1,4 +1,4 @@
-# 4D-ID Specification
+# 4D-ID™ Specification
 
 **One persistent name for everything real.** An open standard for spatial identity.
 

@@ -1,4 +1,4 @@
-# 4D-ID 2.3, Part 1: Core
+# 4D-ID™ 2.3, Part 1: Core
 
 **Unified Spatiotemporal Identity for Shared Reality. Open Standard Working Draft, Part 1 of 6.**
 
