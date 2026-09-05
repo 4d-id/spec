@@ -1,0 +1,14 @@
+name: validate
+on: [push, pull_request]
+jobs:
+  schemas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Validate JSON Schemas and conformance manifest
+        run: |
+          npm i -g ajv-cli@5
+          for f in schemas/*.json; do echo "checking $f"; node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))"; done
+          node -e "const m=JSON.parse(require('fs').readFileSync('conformance/manifest.json','utf8'));console.log('conformance tests:',m.tests.length)"

@@ -1,0 +1,18 @@
+4D-ID Specification License
+
+The specification text in this repository (the files under parts/) is made
+available for review and implementation under an open documentation license,
+pending contribution to a standards body. You may read, implement, and quote it
+with attribution.
+
+The machine-readable artifacts in this repository (schemas/, openapi/,
+conformance/) and all associated code are licensed under the Apache License,
+Version 2.0:
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+The 4D-ID identifier is self-minting and permissionless: anyone may create a
+valid 4D-ID with no registry, no gatekeeper, and no fee. The standard is
+intended to be royalty-free.
+
+Copyright 2026 Quantum Studio and the 4D-ID contributors.
