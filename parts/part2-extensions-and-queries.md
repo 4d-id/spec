@@ -1,13 +1,13 @@
 # 4D-ID 2.3, Part 2: Extensions and queries
 
-**Unified Spatiotemporal Identity for Shared Reality. Open Standard Working Draft, Part 2 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Candidate Open Standard Working Draft, Part 2 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
 | Version | 2.3 (working draft) |
 | Date | September 2026 |
-| Status | Working draft, offered for community review. Not yet adopted by any standards body. |
+| Status | Candidate open standard working draft, offered for community review. Not adopted by any standards body. |
 
 ## Abstract
 
@@ -56,13 +56,13 @@ For drone corridors and remote identification, chain of custody in logistics, pr
 Views (17.4), place policy (11.5), planners, and AI reasoning need to know what a thing is and what it permits. Appearance is out of scope.
 
 > **/req/semantics/fields**
-> The extension SHALL carry a class identifier from a declared namespaced taxonomy; classification provenance (model, version, confidence); affordance flags from at least {collidable, walkable, sittable, graspable, occluder, openable, hazardous, structural, immovable, localization}; and a bounding hull in the local frame. It MAY carry a discrete state from the taxonomy, and, where the `localization` affordance is set, a localization-quality value in [0, 1] indicating how reliably a device may visually position against the feature. The hull SHALL be the authoritative geometry for affordance decisions. The taxonomy SHALL reserve namespaces for relation types (7.9), event classes, and the built environment (parcel, building, floor, unit, room, facade, window, door, riser, fixture).
+> The extension SHALL carry a class identifier from a declared namespaced taxonomy; classification provenance (model, version, confidence); affordance flags from at least {collidable, walkable, sittable, graspable, occluder, openable, hazardous, structural, immovable, localization}; and a bounding hull in the local frame. It MAY carry a discrete state from the taxonomy, and, where the `localization` affordance is set, a localization-quality value in [0, 1] advertising the quality of this feature as input to an external localizer. The hull SHALL be the authoritative geometry for affordance decisions. The taxonomy SHALL reserve namespaces for relation types (7.9), event classes, and the built environment (parcel, building, floor, unit, room, facade, window, door, riser, fixture).
 
 > **/req/semantics/localization**
-> A feature marked with the `localization` affordance is declared stable enough for a device to compute its own pose by matching against it. A device localizing against a scene SHOULD prefer features with this affordance and higher localization quality and SHOULD ignore transient or seasonal features that lack it. This Standard addresses the features a localizer consumes; it does not define the localization method.
+> A feature marked with the `localization` affordance is declared stable enough for an external localization service to consume as an input. A client or external localizer SHOULD prefer features with this affordance and higher localization quality and SHOULD ignore transient or seasonal features that lack it. This family neither performs matching nor localization; the quality is an advertised input-quality value.
 
 > **/req/semantics/event**
-> An event (a detection, an alert, an incident, an operation) SHALL be modeled as an entity: its pose and hull give its spatial extent, its validity window gives its time interval, its class comes from the event namespace, and its subjects and supporting observations are relations. No separate event record is defined; the cell-time query (10.1) answers "what happened here in this interval."
+> An event (an alert, incident, operation, or an explicitly promoted detection event) SHALL be modeled as an entity: its pose and hull give its spatial extent, its validity window gives its time interval, its class comes from the event namespace, and its subjects and supporting observations are relations. A detection remains an observation/evidence item unless deliberately promoted as an event; an event entity SHALL NOT become an identity for its detected subject. Subject identity comes from resolver decisions. No separate event record is defined; the cell-time query (10.1) answers "what happened here in this interval."
 
 ## 10. Access and queries (requirements class: `query`)
 
@@ -72,20 +72,20 @@ A client that holds a 4D-ID needs a small, fixed set of operations whose meaning
 
 > **/req/query/operations**
 > An implementation SHALL provide the following operations with the stated semantics, over at least one documented binding:
-> - `resolve(registry, external_id)` or `resolve(4did)`: the 4D-ID and its current locator (14.1), or a signed negative.
+> - `resolve(registry, external_id)` or `resolve(4did)`: the accepted existing 4D-ID and its current locator (14.1), or a signed negative. Resolve SHALL not silently mint, perceive, localize, match, re-identify/SEGS, or register; external candidate evidence is handled by lifecycle-specific services and policy.
 > - `get_entity(4did)`: stable metadata (parent, motion mode, status, labels, layer, lease, semantics, relation summary).
 > - `get_state(4did, at?)`: the current 4D-State, or the state at a past instant within retention where `history` is claimed.
 > - `get_relations(4did, type?, direction?, at?, min_confidence?, depth?)`: relations (7.9) with validity, confidence, and provenance.
 > - `query(cells, interval?, layer?, class?)`: entities by cell and time (10.2).
 > - `query_events(subject?, cells?, interval, class?, min_confidence?)`: event entities (9.4).
 > - `transform(from_4did, to_4did, at?)`: the composed transform and its uncertainty (7.6, 7.8).
-> - `get_representations(4did, purpose, credentials)`: representations (7.9) ranked for a declared purpose (rendering, measurement, localization, agent context, remote viewing) subject to credentials, license, tier, and validity.
+> - `get_representations(4did, purpose, credentials)`: representations (7.9) ranked for a declared downstream consumer purpose (rendering by a client, measurement, localization input for an external localizer, agent context, remote viewing) subject to credentials, license, tier, and validity. The resolver only ranks/returns representations and metadata.
 > - `get_snapshot()`: a snapshot (16.5); `list(cells, snapshot)`: state at that snapshot.
 > - `watch(cells | 4did, since)`: changes after a generation or snapshot (16.5), with drop indicators (13.2).
 > - `context(4did, fields?, max_entities?, max_bytes?, snapshot?)`: a context envelope (10.6).
 > Operations SHALL be idempotent except `watch`, SHALL carry the snapshot or generation they answered from, and SHALL fail with a documented error rather than a partial silent result.
 
-Agent and tool protocols carry these operations; they do not carry the high-rate 4D-State stream (13), which remains the path for robots, headsets, vehicles, and renderers.
+Agent and tool protocols carry these operations; they do not carry the high-rate 4D-State stream (13), which remains the path for robots, headsets, vehicles, and renderer clients. Ray, visibility, and context operations are data/query services; they do not render, perform visual perception, or localize.
 
 ### 10.2 Hierarchical and temporal
 
@@ -141,7 +141,7 @@ This is a hand-defined feature vector for indexing and similarity search, not a 
 | 29 | log10 of anchor cell edge length, clamped to [−3, 7], scaled to [0, 1] |
 | 30, 31 | Reserved, zero |
 
-Position is LCS-relative so that similarity search is not dominated by global magnitude; global context comes from filtering by cell first.
+Position is LCS-relative so that similarity search is not dominated by global magnitude; global context comes from filtering by cell first. An external indexing or matching service MAY use this vector. Similarity is not identity: externally produced matches are candidate evidence that the resolver records with provenance and decision status, not an automatic merge or mint decision.
 
 ---
 
@@ -156,15 +156,15 @@ Position is LCS-relative so that similarity search is not dominated by global ma
 | `/conf/presence/attestation` | D, F | Verify binding, algorithms, key identifier; present an expired attestation; verify rejection as proof and retention as history. |
 | `/conf/presence/credential` | D | Validate as a VC 2.0 credential. |
 | `/conf/semantics/fields` | D | Validate class, provenance, affordances, hull. |
-| `/conf/query/operations` | F | Exercise every operation over a documented binding; verify semantics, idempotence, snapshot tagging, and documented errors. |
+| `/conf/query/operations` | F | Exercise every operation over a documented binding; verify existing-ID and signed-negative responses, no implicit minting, semantics, idempotence, snapshot tagging, and documented errors. |
 | `/conf/query/cell-time` | F | Query a cell at an instant and a subtree; verify completeness; query a past pose where `history` is claimed. |
 | `/conf/query/relations` | F | Query relations by type, direction, time, confidence, and depth; verify filtering and bounded traversal. |
 | `/conf/query/events` | F | Query events by subject, area, interval, class; verify results and confidence filtering. |
 | `/conf/query/context-envelope` | F | Request an envelope with field selection and bounds; verify determinism at a snapshot, credential filtering, size bound, and absence of geometry. |
-| `/conf/query/ray` | F | Cast rays at known geometry; verify order, local intersection, provenance, uncertainty. |
-| `/conf/query/visibility` | F | Query a known frustum 30 ms ahead; verify culling, LOD hints, extrapolation, decayed confidence. |
+| `/conf/query/ray` | F | Select data for rays at known geometry; verify ordered hits, local intersection data, provenance, and uncertainty without requiring rendering or visual perception. |
+| `/conf/query/visibility` | F | Select data for a known frustum 30 ms ahead; verify culling, LOD hints, extrapolation, and decayed confidence without requiring rendering or localization. |
 | `/conf/features/vector` | D | Validate length, order, normalization. |
-| `/conf/semantics/localization` | D | Validate the localization affordance and quality on stable features; verify transient features lack it. |
+| `/conf/semantics/localization` | D | Validate metadata-only localization affordance and quality on stable features as input to an external localizer; verify no localization algorithm is required and transient features lack the affordance. |
 | `/conf/semantics/event` | F | Publish an event entity; verify cell-time query over its interval returns it with subjects as relations. |
 
 *End of Part 2.*

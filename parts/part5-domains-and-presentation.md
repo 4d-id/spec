@@ -1,13 +1,13 @@
 # 4D-ID 2.3, Part 5: Domains, portals, proxies, and presentation
 
-**Unified Spatiotemporal Identity for Shared Reality. Open Standard Working Draft, Part 5 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Candidate Open Standard Working Draft, Part 5 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
 | Version | 2.3 (working draft) |
 | Date | September 2026 |
-| Status | Working draft, offered for community review. Not yet adopted by any standards body. |
+| Status | Candidate open standard working draft, offered for community review. Not adopted by any standards body. |
 
 ## Abstract
 
@@ -28,7 +28,7 @@ Part 1 assumes every identity is minted in a DGGS cell. Simulators, generated en
 A domain is a root frame with its own grid. Earth is the domain whose grid is DGGS. A domain root is an entity: it has a 4D-ID, a home zone, a lifecycle, and optionally a parent.
 
 > **/req/domain/declaration**
-> A domain SHALL declare its grid (a DGGS variant for Earth; `oct` or a documented synthetic grid otherwise), a mode (**real**, **replica** of a real place, **scenario** proposing changes to a real place, or **generated**), an extent policy (fixed or growing), a time mapping (17.5), an instance relation (template or instance of a template), provenance (generating model and version, source capture or prompt; for a domain derived from a real place, a `derived_from` reference to the Earth anchor with registration transform and quality), and its authority.
+> A domain SHALL declare its grid (a DGGS variant for Earth; `oct` or a documented synthetic grid otherwise), a mode (**real**, **replica** of a real place, **scenario** proposing changes to a real place, or **generated**), an extent policy (fixed or growing), a time mapping (17.5), an instance relation (template or instance of a template), provenance (generating model and version, source capture or prompt; for a domain derived from a real place, a `derived_from` reference to the Earth anchor with an externally supplied registration transform and quality), and its authority. Source capture/prompt and registration transform/quality are supplied by external generators or registration services; the family records them.
 
 > **/req/domain/embedding**
 > A domain root MAY have a parent in another domain. An embedded domain is an ordinary node whose transform MAY carry uniform scale (7.7) and which counts toward depth (7.1). Within a domain space SHALL be Euclidean; non-Euclidean connectivity SHALL be expressed only through portals. A generated environment whose geometry does not close on itself SHALL be modeled as several domains joined by portals.
@@ -65,7 +65,7 @@ A person's body is an Earth entity: it never crosses a portal and never leaves C
 
 ### 17.4 Views
 
-A view is a layer whose entities are identity-bound proxies of another layer's entities, rendered with different assets. Re-theming a room, showing pipe routes through a wall, or overlaying a planned layout on a live warehouse are views.
+A view is a layer whose entities are identity-bound proxies of another layer's entities, presented with different assets by a client. Re-theming a room, showing pipe routes through a wall, or overlaying a planned layout on a live warehouse are views.
 
 > **/req/domain/view-identity**
 > Interaction in a view (ray-cast hits, selection, hand-offs) SHALL reference the source 4D-ID through `proxy_of`, not the view's asset. Two consumers in different views of one space SHALL resolve one physical object to one identity.
@@ -82,14 +82,14 @@ A simulation running at ten times real time, a replay of yesterday's shift, and 
 ### 17.6 Correspondence
 
 > **/req/domain/correspondence**
-> Entities in different domains that denote matching features MAY be linked by a `corresponds_to` relation (7.9) carrying a transform estimate in addition to its confidence. Correspondence is used for relocalization and for registering a generated or reconstructed domain to its source place. Entities in different domains SHALL NOT be merged (15.2).
+> An external correspondence/matching or registration service MAY submit a `corresponds_to` relation (7.9) between entities in different domains, carrying an externally computed transform estimate in addition to its confidence. Consumers MAY use the recorded result for relocalization or registration. This family does not determine correspondence, relocalize, or register. Entities in different domains SHALL NOT be merged (15.2).
 
 
 ---
 
 ## 18. Presentation (requirements class: `presentation`)
 
-Moving a viewer from a regional view to a site to an interior scan is not flight through one continuous model. It is resolving one identity down its hierarchy and handing off between representations captured separately, at different fidelity, under different licenses. This clause carries what a client needs to make that handoff fast and continuous. It adds no geometry and performs no registration; it names where the camera goes and what stays fixed across a cut.
+Moving a viewer from a regional view to a site to an interior scan is not flight through one continuous model. It is resolving one identity down its hierarchy and handing off between representations captured separately, at different fidelity, under different licenses. This clause carries what a client needs to make that handoff fast and continuous. It adds no geometry and performs no registration; it names identifiers, placement inputs, and continuity metadata for clients, not rendering or computed registration.
 
 ### 18.1 Viewpoints
 
@@ -124,7 +124,7 @@ Navigational placement is enough to move through a building; it is not enough to
 A client that draws content onto the viewer's live view of the real world (a highlight on a structure the viewer is looking at, a label on a distant feature) depends on two uncertainties: how well the viewer's own pose is known, and how well the target entity is registered.
 
 > **/req/presentation/overlay-confidence**
-> A client compositing an overlay onto the real world SHALL combine the viewer's localization uncertainty (7.8) with the target entity's registration uncertainty into a combined placement uncertainty, and SHALL degrade the overlay (fading, widening, outlining, or suppressing) as that uncertainty grows, so that a confidently placed overlay and a poorly placed one are visually distinct. A confidently drawn overlay on the wrong target is a failure this requirement exists to prevent.
+> A client/localizer compositing an overlay onto the real world SHALL combine the viewer's localization uncertainty (7.8) with the target entity's registration uncertainty into a combined placement uncertainty, and SHALL degrade the overlay (fading, widening, outlining, or suppressing) as that uncertainty grows, so that a confidently placed overlay and a poorly placed one are visually distinct. A confidently drawn overlay on the wrong target is a failure this requirement exists to prevent.
 
 At 80 meters a half-degree pose error moves an overlay a meter, onto the neighboring feature. Combining the two uncertainties, and showing the result, is what keeps a highlight honest: solid when the placement is trustworthy, tentative when it is not.
 ---
@@ -134,7 +134,7 @@ At 80 meters a half-degree pose error moves an overlay a meter, onto the neighbo
 | Test | Method | Purpose |
 |---|---|---|
 | `/conf/domain/declaration` | D, F | Verify grid, mode, extent policy, time mapping, instance relation, provenance, authority; verify a scenario domain carries `derived_from` and is distinguishable from a real one by mode alone. |
-| `/conf/domain/embedding` | F | Embed a domain at 1:1000; verify depth accounting and composition; register a non-closing loop in one domain; verify refusal or split. |
+| `/conf/domain/embedding` | F | Embed a domain at 1:1000; verify depth accounting and composition; submit an externally registered non-closing loop result and verify refusal or split. |
 | `/conf/domain/instancing` | F | Instance a template twice; verify shared almanac and independent state; expire a domain; verify descendants terminal. |
 | `/conf/domain/portal` | F | Add a portal; verify composition, depth, and cycle detection unaffected; verify one-signature portal refused. |
 | `/conf/domain/portal-crossing` | F | Cross a portal; verify re-parent, transformed pose, portal-referenced marker. |
@@ -143,11 +143,11 @@ At 80 meters a half-degree pose error moves an overlay a meter, onto the neighbo
 | `/conf/domain/affordance-truth` | F | Bind a smaller proxy hull to a real obstacle; verify rejection or divergence flag. |
 | `/conf/domain/view-identity` | F | Ray-cast from two views; verify the same source 4D-ID. |
 | `/conf/domain/time-mapping` | F | Pause a domain; verify extrapolation suspended; query history in both clocks. |
-| `/conf/domain/correspondence` | F | Attempt cross-domain merge; verify refusal; verify correspondence accepted. |
-| `/conf/presentation/viewpoint` | D, F | Place a viewpoint; verify a client composes the framed entity from it. |
+| `/conf/domain/correspondence` | F | Submit externally computed correspondence and verify it is recorded and consumable; verify cross-domain merge is refused and no in-family matcher or registration step is required. |
+| `/conf/presentation/viewpoint` | D, F | Place a viewpoint; verify a client consumes its identifiers and placement inputs to compose the framed entity. |
 | `/conf/presentation/ladder` | D | Validate an ordered LOD ladder; verify it agrees with the tree and `represents`. |
 | `/conf/presentation/transition` | F | Declare a transition with a door as continuity anchor; verify the anchor holds screen position across the cut. |
 | `/conf/presentation/tier-honesty` | F | Present a sub-metric representation for measurement; verify the tier is indicated and metric required. |
-| `/conf/presentation/overlay-confidence` | F | Overlay a target at range with poor viewer localization; verify the overlay degrades and does not present as confident. |
+| `/conf/presentation/overlay-confidence` | F | A client composites a target at range with poor viewer localization; verify the overlay degrades and does not present as confident. |
 
 *End of Part 5.*

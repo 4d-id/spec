@@ -1,5 +1,5 @@
 {
-  "note": "Phase 1 skeleton, generated from the 2.3 spec Annex A tables. 'schema' = a schema-level (D) check is wired now; 'todo' = awaits the reference resolver (Phase 2+).",
+  "note": "Phase 1 skeleton from the current candidate open standard working-draft Annex A tables. Tests validate recording, resolution, and consumption of externally produced evidence/results; they do not require perception, grounding/matching/re-identification/SEGS, localization, registration, or rendering implementations. 'schema' = a schema-level (D) check is wired now; 'todo' = awaits the reference resolver (Phase 2+).",
   "version": "2.3",
   "tests": [
     {

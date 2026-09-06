@@ -6,7 +6,9 @@ info:
     The REST binding of the Clause 10 access operations (Part 2, 10.1).
     One semantic API, many bindings: these operations have the same meaning
     over REST, gRPC, MCP, an agent-to-agent task, a ROS service, or an engine
-    plugin. This document is the REST binding; it is not normative.
+    plugin. This document is the REST binding; it is not normative. Callers
+    supply identity records, grounding, state, and evidence; these operations
+    do not perform perception, matching, localization, registration, or rendering.
   license:
     name: Apache-2.0
     identifier: Apache-2.0
@@ -20,14 +22,14 @@ paths:
     get:
       operationId: resolve
       tags: [access]
-      summary: Resolve an external identifier or a 4D-ID to its 4D-ID and current locator.
+      summary: Resolve a supplied external identifier or 4D-ID to its stored 4D-ID and current locator; lookup only, with no implicit minting.
       parameters:
         - { name: registry, in: query, schema: { type: string } }
         - { name: external_id, in: query, schema: { type: string } }
         - { name: id, in: query, schema: { $ref: "#/components/schemas/fourdid" } }
       responses:
         "200":
-          description: Resolved.
+          description: Resolved existing identity; this operation does not mint.
           content:
             application/json:
               schema:
@@ -145,7 +147,7 @@ paths:
     get:
       operationId: get_representations
       tags: [access]
-      summary: Representations ranked for a declared purpose, subject to credentials, license, tier, validity.
+      summary: Representations and metadata ranked for a downstream client purpose, subject to credentials, license, tier, and validity; no rendering or localization is performed.
       parameters:
         - { name: id, in: path, required: true, schema: { $ref: "#/components/schemas/fourdid" } }
         - { name: purpose, in: query, required: true, schema: { type: string, enum: [rendering, measurement, localization, agent-context, remote-viewing] } }

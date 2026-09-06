@@ -1,17 +1,17 @@
 # 4D-ID 2.3, Part 4: Planetary-scale architecture
 
-**Unified Spatiotemporal Identity for Shared Reality. Open Standard Working Draft, Part 4 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Candidate Open Standard Working Draft, Part 4 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
 | Version | 2.3 (working draft) |
 | Date | September 2026 |
-| Status | Working draft, offered for community review. Not yet adopted by any standards body. |
+| Status | Candidate open standard working draft, offered for community review. Not adopted by any standards body. |
 
 ## Abstract
 
-How the core behaves when the hierarchy holds a planet: region-keyed propagation with backpressure and fourteen failure classes; delegated resolution with home registers and single-writer local authority; an identity lifecycle in which observations travel as evidence and identities survive perception, loss of contact, and virtual sprawl; and the scale mechanisms without which implementations would not interoperate at scale. Performance techniques internal to one implementation are in Part 6.
+How the core behaves when the hierarchy holds a planet: region-keyed propagation with backpressure and fourteen failure classes; delegated resolution with home registers and single-writer local authority; an identity lifecycle in which observations travel as evidence and identities survive handoff among external perception/grounding systems, loss of contact, and virtual sprawl; and the scale mechanisms without which implementations would not interoperate at scale. Performance techniques internal to one implementation are in Part 6.
 
 ## Conformance
 
@@ -117,25 +117,25 @@ Identity is global; state is local. Resolution follows the shape that DNS and ce
 
 ## 15. Identity lifecycle (requirements class: `lifecycle`)
 
-Perception produces detections by the thousand per second; virtual content is created by anyone and forgotten by everyone. These rules keep the identity space clean.
+Perception services may produce detections by the thousand per second; virtual content is created by anyone and forgotten by everyone. These rules keep the identity space clean.
 
 ### 15.1 Observation and identity
 
 > **/req/lifecycle/observation**
-> A perceiving system SHALL NOT mint a 4D-ID per detection. An observation is not a 4D-ID and SHALL NOT be propagated as identity state; it MAY be exchanged as ephemeral evidence for correlation, fusion, re-identification, and provenance. A 4D-ID SHALL be minted only when observations match no existing identity at a *declared* re-identification confidence, or the entity is declared persistent by its creator. An identity minted below a *declared* confidence threshold SHALL be provisional until the threshold is crossed; its identity confidence is carried in provenance (7.8).
+> An observation SHALL be treated as evidence only and SHALL NOT be propagated as identity state. Resolver/ingest SHALL first check exact identifiers and acceptable existing identities. External matching, grounding, re-identification, or SEGS services MAY submit candidate results, but those functions are not specified or run by this family. If an acceptable existing match exists, it SHALL be reused. Only when no acceptable match exists may an authorized resolver mint a new or provisional 4D-ID; creator-declared persistence is subject to the same check. Ambiguity SHALL produce candidate records and no automatic mint or merge. An identity minted below a *declared* confidence threshold SHALL be provisional until the threshold is crossed; its identity confidence is carried in provenance (7.8).
 
 > **/req/lifecycle/observation-record**
-> An observation exchanged as evidence SHALL carry a sensor identifier, source time and bound, pose in a stated frame, uncertainty, classification and confidence, an evidence hash, an expiry, and optionally a candidate 4D-ID. It SHALL have no home register, lease, history, or relations other than `observed_by` from the identity it supports, and SHALL expire without propagation.
+> An observation exchanged as evidence SHALL carry a sensor identifier, source time and bound, pose in a stated frame, uncertainty, classification and confidence, an evidence hash, an expiry, and optionally a candidate 4D-ID supplied by an external matcher. The candidate is non-authoritative evidence and SHALL NOT change identity or state. An observation SHALL have no home register, lease, history, or relations other than `observed_by` from accepted identity state it supports, and SHALL expire without propagation.
 
-A radar, a camera, a drone, and an operator may all see a thing before anyone knows it is one thing. Their observations travel; the identity is minted once.
+A radar, a camera, a drone, and an operator may all produce evidence before anyone knows it is one thing. Their observations and externally supplied candidate associations travel as evidence; an identity is reused or minted only through the resolve-first lifecycle.
 
 ### 15.2 Merge and split
 
 > **/req/lifecycle/merge**
-> When two 4D-IDs are found to denote one entity, the survivor SHALL be the earlier genesis, and the merge SHALL be authenticated (12.1). Each other SHALL move to merged with a derivation reference to the survivor, SHALL remain resolvable through its home register within retention, and SHALL redirect. Entities in different domains SHALL NOT be merged (17.6).
+> When an authorized resolver decision, based on externally supplied evidence, determines that two 4D-IDs denote one entity, the survivor SHALL be the earlier genesis, and the merge SHALL be authenticated (12.1). Similarity or candidate evidence alone SHALL NOT merge identities. Each other SHALL move to merged with a derivation reference to the survivor, SHALL remain resolvable through its home register within retention, and SHALL redirect. Entities in different domains SHALL NOT be merged (17.6).
 
 > **/req/lifecycle/split**
-> When one 4D-ID is found to denote several entities, new identities SHALL be minted with derivation references to the original, whose continuation or termination SHALL be recorded in the derivation.
+> When an authorized resolver decision, based on externally supplied evidence, determines that one 4D-ID denotes several entities, new identities MAY be minted with derivation references to the original, whose continuation or termination SHALL be recorded in the derivation. Candidate evidence alone SHALL NOT split or mint identities.
 
 ### 15.3 Leases and layers
 
@@ -216,9 +216,9 @@ A yard of containers is one record to a drone at a kilometer and thousands to a 
 | `/conf/fabric/handoff` | F | Cross a zone boundary mid-stream; verify no loss and forwarding during grace. |
 | `/conf/fabric/single-writer` | F | Submit for one LCS from two producers; verify second rejected as `pose_conflict`. |
 | `/conf/fabric/local-first` | F | Sever the wide-area link; verify local zone continues at full rate; remove the authority; verify transfer with structural update. |
-| `/conf/lifecycle/observation` | F | Present 1,000 detections of one object from three sensors; verify observations exchanged as evidence, at most one identity, provisional below threshold. |
-| `/conf/lifecycle/observation-record` | D, F | Validate fields; verify expiry without propagation; verify no home register or lease. |
-| `/conf/lifecycle/merge` | F | Merge; verify survivor, redirect, and rejection of new records to the merged identity; attempt cross-domain merge; verify refusal. |
+| `/conf/lifecycle/observation` | F | Inject externally produced observations and candidate evidence for one object from three sources; verify evidence-only handling, existing-identity reuse, ambiguity without automatic mint/merge, and provisional status below threshold. |
+| `/conf/lifecycle/observation-record` | D, F | Validate evidence fields and optional externally supplied candidate 4D-ID; verify expiry without propagation and no home register or lease. |
+| `/conf/lifecycle/merge` | F | Submit externally supplied evidence and an authorized resolver decision; verify survivor, redirect, and rejection of new records to the merged identity; verify similarity/candidates alone do not merge; attempt cross-domain merge; verify refusal. |
 | `/conf/lifecycle/split` | F | Split; verify derivation references. |
 | `/conf/lifecycle/lease` | F | Withhold renewal; verify terminal at expiry without producer action. |
 | `/conf/lifecycle/layer` | F | Two entities at one pose in two layers; verify no conflict and layer filtering. |

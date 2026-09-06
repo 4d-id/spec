@@ -2,6 +2,12 @@
 
 All notable changes to the 4D-ID specification are recorded here. The specification version is independent of any implementation version.
 
+## Unreleased — September 6, 2026 — boundary clarification
+- Grounding determines the referent; localization determines where; 4D-ID preserves continuity of the resolved referent across systems and time. The family records externally produced evidence/results but does not perform perception, grounding/matching, re-identification/SEGS, localization, registration, or rendering.
+- Observations are evidence only. Resolution checks acceptable existing identities first; minting is allowed only when no acceptable match exists under the responsible authority's policy. Resolvers may record externally supplied candidate associations and authorized lifecycle decisions; candidate evidence alone does not merge or mint.
+- Clarified candidate open standard working-draft and no-adoption wording across the repository.
+
+
 ## 2.3 — September 2026 (working draft)
 - Clause 10 defined as access operations: one semantic API, many bindings (REST, MCP, and others). Added relation and event queries, purpose-based representation negotiation, snapshot access, watch, and a bounded context envelope.
 - P5 (AI-Integrated) now requires `semantics`.
@@ -11,7 +17,7 @@ All notable changes to the 4D-ID specification are recorded here. The specificat
 - Editorial: family map, scope pointers, and feature-vector depth field corrected.
 
 ## 2.2
-- `localization` affordance and quality; registration tier on exterior representations; overlay-confidence rule for AR.
+- `localization` affordance and quality; registration tier on exterior representations; overlay-confidence rule for AR. These are affordance/quality and provenance metadata consumed by external localizers or clients, not functions performed by 4D-ID.
 
 ## 2.1
 - `presentation` class: viewpoints, level-of-detail ladder, transition hints, continuity anchors, registration tier.
@@ -20,7 +26,7 @@ All notable changes to the 4D-ID specification are recorded here. The specificat
 - `represents` and `identified_as` relations; vertical reference grammar and floor frames; domain mode.
 
 ## 1.8
-- Identity continuity principle and structural history; `lost_contact` status; observations as ephemeral evidence; fused-state provenance; typed relations; events as entities; coherent snapshots; assured security subclause; P6 Assured profile.
+- Identity continuity principle and structural history; `lost_contact` status; observations as ephemeral evidence; fused-state provenance; typed relations; events as entities; coherent snapshots; assured security subclause; P6 Assured profile. Observations and registration/localization values remain recorded evidence/metadata, not in-family processing.
 
 ## 1.7
 - Restructured into six parts governed by the one-rule test; reduced to the requirements that carry interoperability.

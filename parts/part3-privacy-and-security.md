@@ -1,13 +1,13 @@
 # 4D-ID 2.3, Part 3: Privacy and security
 
-**Unified Spatiotemporal Identity for Shared Reality. Open Standard Working Draft, Part 3 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Candidate Open Standard Working Draft, Part 3 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
 | Version | 2.3 (working draft) |
 | Date | September 2026 |
-| Status | Working draft, offered for community review. Not yet adopted by any standards body. |
+| Status | Candidate open standard working draft, offered for community review. Not adopted by any standards body. |
 
 ## Abstract
 
@@ -33,7 +33,7 @@ This clause applies wherever tracked entities include humans or human-associated
 > Every history and prediction entry SHALL carry an expiry or time-to-live. Expired entries SHALL be deleted and SHALL NOT be propagated. Expired unconfirmed predictions SHALL be discarded. Retention is enforced in wall time regardless of domain time (17.5). Attestations follow the issuer's retention policy and are kept distinct from operational history.
 
 > **/req/privacy/consent**
-> A human-associated entity SHALL NOT be proxied (17.3) into any layer or domain, and observations or reconstructions capturing a person or a surface a place policy marks private SHALL NOT be promoted to persistent entities or almanacs, without an opt-in recorded by the entity's authority. Opt-in is scoped and revocable; revocation terminates proxies and triggers erasure (12.4).
+> The family governs promotion and disclosure of externally produced observations and reconstructions; it does not create them. A human-associated entity SHALL NOT be proxied (17.3) into any layer or domain, and observations or reconstructions capturing a person or a surface a place policy marks private SHALL NOT be promoted to persistent entities or almanacs, without an opt-in recorded by the entity's authority. Opt-in is scoped and revocable; revocation terminates proxies and triggers erasure (12.4).
 
 > **/req/privacy/place-policy**
 > A zone authority (14.1) MAY publish a place policy; domains, layers, and propagation layers SHALL honor it. A policy MAY restrict which layers may be proxied into the zone, which affordances (9.4) proxies may carry, which activity classes a domain may host there, and the minimum disclosure resolution for human-associated entities. The policy language is not specified.
@@ -45,7 +45,7 @@ The threat model: producers may lie; resolvers and caches may be compromised; do
 ### 12.1 Baseline (required by every profile)
 
 > **/req/security/authenticated-operations**
-> Minting, registration, structural updates, lifecycle transitions, authority transfer, merge, and proxy rebinding SHALL be authenticated to a principal. Merge SHALL be authorized by the authorities of both identities or by the home zone and recorded in the derivation chain.
+> Minting, acceptance/recording of externally supplied registration results, structural updates, lifecycle transitions, authority transfer, merge, and proxy rebinding SHALL be authenticated to a principal. Merge SHALL be authorized by the authorities of both identities or by the home zone and recorded in the derivation chain.
 
 > **/req/security/replay**
 > Consumers SHALL reject records whose sequence number is not greater than the last accepted for that 4D-ID, except during documented replay after disconnect (13.5).
@@ -69,7 +69,7 @@ Pose is not authenticated by the core. `velocity_violation` (13.5) flags implaus
 > A proxy SHALL NOT disclose pose, semantics, extents, state, rig, or motion to a consumer at finer fidelity than the source's disclosure policy permits that consumer. Following secondary references from a human-associated entity SHALL be a credentialed operation under the same policy.
 
 > **/req/security/perception-provenance**
-> An identity minted from perception (15.1) SHALL carry classification provenance (9.4). Place policy MAY require a minimum re-identification confidence or corroboration from more than one sensor before a perceived entity may carry collidable, occluder, or hazardous affordances.
+> An identity minted after externally supplied perception/grounding evidence and a resolve-first check (15.1) SHALL carry classification provenance (9.4). Re-identification confidence and corroboration are external evidence fields and policy inputs, not algorithms defined here. Place policy MAY require a minimum confidence or corroboration from more than one sensor before an externally evidenced entity may carry collidable, occluder, or hazardous affordances.
 
 ### 12.4 People and places (required with `privacy`)
 
@@ -82,7 +82,7 @@ Pose is not authenticated by the core. `velocity_violation` (13.5) flags implaus
 ### 12.5 Audit (required with `fabric`)
 
 > **/req/security/audit**
-> Each zone SHALL keep a signed, hash-chained, append-only log of merges, splits, structural history events, authority transfers, consent grants and revocations, erasures, place-policy changes, almanac generations, and portal creation and removal, queryable by credentialed parties within the zone's retention policy. Implementations proxying human-associated entities SHALL pass the functional tests for disclosure inheritance, consent, and erasure, not inspection alone.
+> Each zone SHALL keep a signed, hash-chained, append-only log of candidate decisions, authorized merges, splits, structural history events, authority transfers, consent grants and revocations, erasures, place-policy changes, almanac generations, and portal creation and removal, queryable by credentialed parties within the zone's retention policy. Implementations proxying human-associated entities SHALL pass the functional tests for disclosure inheritance, consent, and erasure, not inspection alone.
 
 ### 12.6 Assured (required by P6)
 
@@ -111,10 +111,10 @@ The fields here are opaque to this family and interpreted only through a referen
 | `/conf/security/attested-delegation` | F | Present a broken delegation chain; verify refusal; verify negative responses signed. |
 | `/conf/security/signed-content` | F | Present an unsigned almanac, a one-signature portal, and an unbound handle table; verify each refused. |
 | `/conf/security/disclosure-inheritance` | F | Query a proxy's pose and semantics with low credentials; verify fidelity bounded by source policy; verify reference traversal refused. |
-| `/conf/security/perception-provenance` | D, F | Verify provenance on perceived identities; verify collidable withheld below the policy floor. |
+| `/conf/security/perception-provenance` | D, F | Verify provenance and policy handling for externally supplied evidence on perceived/grounded identities; verify no perception, matching, localization, or registration implementation is required and collidable is withheld below the policy floor. |
 | `/conf/security/aggregate-suppression` | F | Query aggregates for a sensitive zone below threshold; verify suppression. |
 | `/conf/security/erasure` | F | Revoke consent; verify purge everywhere within the window; verify digest demonstrates it. |
-| `/conf/security/audit` | F | Perform logged operations; verify chained signed entries; tamper; verify detection. |
+| `/conf/security/audit` | F | Perform candidate and authorized merge decisions plus other logged operations; verify chained signed entries; tamper; verify detection. |
 | `/conf/security/assured-labels` | D, F | Validate label, releasability, policy and authentication references; downgrade a record; verify redaction provenance without origin content. |
 | `/conf/security/authenticated-state` | F | Insert, replay, and modify records on the session; verify detection; revoke a key; verify flagging. |
 

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://4did.org/schemas/2.3/observation.json",
   "title": "Observation",
-  "description": "Ephemeral evidence, never propagated as identity state (Part 4, 15.1).",
+  "description": "Externally produced evidence, never propagated as identity state (Part 4, 15.1). The legacy candidate_4did property is a shorthand for a candidate-reference record; candidate associations are non-authoritative and do not mint, merge, or change identity.",
   "type": "object",
   "properties": {
     "sensor_id": { "type": "string" },

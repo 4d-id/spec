@@ -1,18 +1,18 @@
 # 4D-ID™ 2.3, Part 1: Core
 
-**Unified Spatiotemporal Identity for Shared Reality. Open Standard Working Draft, Part 1 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Candidate Open Standard Working Draft, Part 1 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
 | Version | 2.3 (working draft) |
 | Date | September 2026 |
-| Status | Working draft, offered for community review. Not yet adopted by any standards body. |
-| Track | Proposed OGC multi-part Implementation Standard; Khronos liaison item for OpenXR and glTF bindings; liaison sought with ROS 2, VDA 5050, ETSI ITS, and ASTM F38 communities |
+| Status | Candidate open standard working draft, offered for community review. Not adopted by any standards body. |
+| Track | Possible future OGC multi-part Implementation Standard; possible Khronos liaison item for OpenXR and glTF bindings; possible liaison targets include ROS 2, VDA 5050, ETSI ITS, and ASTM F38 communities |
 
 ## Abstract
 
-4D-ID assigns every object, surface, agent, and environment, physical or virtual, a stable hierarchical identity that binds an Earth-anchored global reference (OGC DGGS), a high-precision local frame, orientation (OGC GeoPose), and time (ISO 8601). It is an identity and addressing layer over existing coordinate systems; it is not a coordinate system, a perception system, a rendering format, or a ledger.
+4D-ID preserves a stable hierarchical identity for each resolved object, surface, agent, and environment, physical or virtual, binding an Earth-anchored global reference (OGC DGGS), a high-precision local frame, orientation (OGC GeoPose), and time (ISO 8601). It is an identity and continuity layer over existing coordinate systems; it is not a coordinate system, perception, grounding/matching, re-identification/SEGS, localization, registration, rendering, or ledger system.
 
 This Part specifies the core: the identifier, the hierarchy, the state record, the time model, motion mode, local coordinate systems, transform conventions, uncertainty and provenance, lifecycle and relations, and the conformance framework for the whole family. Four concepts carry it: identity, hierarchy, pose, time. Parts 2 through 5 add optional requirements classes for extensions and access, privacy and security, planetary-scale operation, and domains and presentation. Part 6 is an informative implementation guide.
 
@@ -27,7 +27,7 @@ This Part specifies the core: the identifier, the hierarchy, the state record, t
 | 5 Domains, portals, proxies, presentation | Virtual, generated, and simulated spaces; cross-domain presence; cinematic navigation | `domain` `presentation` | 17, 18 |
 | 6 Implementation guide | Informative techniques, agent patterns, systems borrowed from, deferred items, developer package | none | G.1 to G.13 |
 
-Part 1 is adoptable on its own. Clause and requirement numbering is unique across the family (5.5).
+Part 1 is usable as a standalone part/profile. Clause and requirement numbering is unique across the family (5.5).
 
 ---
 
@@ -35,7 +35,7 @@ Part 1 is adoptable on its own. Clause and requirement numbering is unique acros
 
 This Part specifies an abstract data model for a persistent spatiotemporal identifier (the 4D-ID) and a transmitted state record (the 4D-State); a hierarchical anchoring model rooted in a Discrete Global Grid System and refined through local coordinate systems; a time model; motion modes; transform, unit, and axis conventions; uncertainty and provenance; identity lifecycle and derivation; alignment with OGC and Khronos standards; and the conformance framework for Parts 1 through 5.
 
-It does not specify pose generation, geometry representation, discovery, or wire encoding. Encoding is the subject of a companion Encoding Standard and developer package (Part 6, G.12, G.13).
+It does not specify pose generation, perception, grounding/matching or re-identification (including SEGS), localization, registration, geometry production, discovery, rendering, or wire encoding. The family records and serves accepted externally produced outputs and evidence; encoding is the subject of a companion Encoding Standard and developer package (Part 6, G.12, G.13).
 
 ## 2. Conformance
 
@@ -56,7 +56,7 @@ A requirement is normative in this family only if two independent implementation
 | `security` | 3 | 12 | Authenticated operations, signed fabric, disclosure inheritance, erasure, audit, assured labels and authenticated state |
 | `propagation` | 4 | 13 | Region-keyed streaming, backpressure, priority, partition, fourteen failure classes |
 | `fabric` | 4 | 14 | Zones, home registers, caching, handoff, single-writer authority |
-| `lifecycle` | 4 | 15 | Observations as evidence, identity minting, merge, split, leases, layers |
+| `lifecycle` | 4 | 15 | Resolution evidence/candidates, identity minting, authorized merge, split, leases, layers |
 | `scale` | 4 | 16 | Almanac and ephemeris, threshold publishing, deltas, digests, snapshots, aggregates |
 | `domain` | 5 | 17 | Domains, portals, proxies, views, domain time |
 | `presentation` | 5 | 18 | Viewpoints, LOD ladder, transition hints, continuity anchors, registration tier |
@@ -97,9 +97,14 @@ OGC 21-056r11 GeoPose 1.0 · OGC 20-040r3 DGGS Abstract Specification · OGC 21-
 **lease.** An expiry after which an unrenewed entity moves to terminal (15.5).
 **Local Coordinate System (LCS).** A bounded, right-handed metric frame anchored to a parent (7.6).
 **motion mode.** Static, physical, or teleportable (7.5).
-**observation.** A detection not yet matched to an identity; exchangeable as ephemeral evidence, never as identity state (15.1).
+**observation.** Externally produced evidence about a possible referent; never identity state, whether or not it has candidate associations (15.1).
+**grounding.** Determining which real or virtual referent a record denotes.
+**localization.** Estimating where a grounded referent is, in a stated frame.
+**candidate match.** A non-authoritative, externally produced association between evidence and a possible 4D-ID, with evidence, provenance, and decision status.
+**resolver.** A component that records and serves accepted IDs, candidate associations, and authorized lifecycle decisions; it does not perform perception, localization, matching, re-identification/SEGS, or registration.
 **pose.** Position and orientation relative to the parent, expressed as GeoPose.
 **relation.** A typed secondary reference between entities with validity, confidence, and provenance; never implies a transform (7.9).
+**Spatial Entity Grounding Service (SEGS).** An adjacent implementation or service that may detect/segment, classify, track/re-identify, localize, and match observations to known entities before submitting evidence or candidate associations to 4D-ID. SEGS is not part of the core family.
 **snapshot.** A vector of zone generations with a reference time and maximum skew, naming one coherent picture (16.5).
 **viewpoint.** An entity with a pose that frames another entity, used to place a camera (18.1).
 **continuity anchor.** The shared entity a client keeps fixed across a transition between representations (18.3).
@@ -123,11 +128,11 @@ OGC 21-056r11 GeoPose 1.0 · OGC 20-040r3 DGGS Abstract Specification · OGC 21-
 
 ## 6. Overview (informative)
 
-Spatial computing runs on frames that do not align: geographic (GIS, HD maps), device-local (headsets, robots), scene graphs (engines, simulators), odometry and map frames (robotics), and reconstruction frames (LiDAR, splats). The standards for each are mature. What is missing is a stable name for a thing that survives movement, re-observation, system boundaries, and the boundary between real and virtual, with the latency and legibility that fleets, vehicles, headsets, and AI systems require at runtime. 4D-ID is that name and the minimum machinery around it.
+Spatial computing runs on frames that do not align: geographic (GIS, HD maps), device-local (headsets, robots), scene graphs (engines, simulators), odometry and map frames (robotics), and reconstruction frames (LiDAR, splats). These are adjacent producers and consumers. 4D-ID consumes their accepted externally produced grounding, localization, registration, and state results and provides a stable name for a resolved referent across movement, re-observation, system boundaries, and the boundary between real and virtual. The family does not perform perception, grounding/matching, re-identification/SEGS, localization, registration, or rendering.
 
 ```
   AI reasoning, planning, analytics       <- feature vector; relations; queries (Part 2)
-  Fleet managers, twins, renderers, UTM   <- 4D-State stream; almanac + ephemeris (Part 4)
+  Fleet managers, twins, renderer clients, UTM <- 4D-State stream; almanac + ephemeris (Part 4)
   ------------------------------------------------------------------------------
   4D-ID: identity + hierarchy + pose + time (Part 1); domains (Part 5)
   ------------------------------------------------------------------------------
@@ -136,7 +141,7 @@ Spatial computing runs on frames that do not align: geographic (GIS, HD maps), d
   SLAM, LiDAR, photogrammetry, sensor fusion, simulators, generative world models
 ```
 
-4D-ID is not a coordinate system, not a replacement for GeoPose or DGGS, not a perception system, not a rendering format, not a blockchain, and not a discovery mechanism. It uses the first two, consumes the output of the third, anchors the fourth, allows signed attestation without the fifth, and pairs with a registry for the sixth.
+4D-ID is not a coordinate system, not a replacement for GeoPose or DGGS, and not a perception, grounding/matching, re-identification/SEGS, localization, registration, rendering, blockchain, or discovery system. It uses GeoPose and DGGS, consumes accepted outputs from adjacent producers, records externally supplied results, allows signed attestation without a ledger, and pairs with registries and clients for discovery and rendering.
 
 ---
 
@@ -154,13 +159,13 @@ Spatial reality is a nested transform tree. Each node has a 4D-ID, a parent, a l
 
 ### 7.2 Identifier
 
-A 4D-ID has three parts: a **genesis anchor** (DGGS variant, cell, optional vertical reference) recording where the identity was minted; a **local descriptor** unique within that anchor; and a **genesis marker** recording when it was minted. All three are fixed at minting.
+A 4D-ID has three parts: a **genesis anchor** (DGGS variant, cell, optional vertical reference) recording minting metadata; a **local descriptor** unique within that anchor; and a **genesis marker** recording when it was minted. All three are fixed at minting. The genesis anchor and marker are locator/mint metadata only and are never evidence of which entity a record denotes.
 
 > **/req/core/identity-stable**
 > A 4D-ID SHALL NOT change as the entity moves, ages, is re-measured, is restructured, changes frame, or is observed by different consumers, so long as continuity of the underlying entity remains authoritative. A vehicle keeps one 4D-ID across its service life; a building across renovation and extension; a robot across map reloads; an aircraft across hours out of contact.
 
 > **/req/core/genesis-anchor**
-> The anchor in the identifier records where the identity was minted. The entity's current anchor SHALL be carried in the 4D-State and SHALL NOT be inferred from the identifier.
+> The anchor in the identifier records where the identity was minted. It SHALL NOT be treated as grounding evidence or as the entity's current location. The entity's current anchor SHALL be carried in the 4D-State and SHALL NOT be inferred from the identifier.
 
 > **/req/core/descriptor**
 > A generated local descriptor SHALL be a UUID (RFC 9562) version 4 or 7, or SHALL carry at least 128 bits of entropy from a documented source. Consumers SHALL NOT interpret the descriptor.
@@ -192,7 +197,7 @@ Two 4D-States sharing a 4D-ID describe one entity at two moments.
 ### 7.4 Time
 
 > **/req/core/timestamps**
-> Every 4D-State SHALL carry source time (when the producer observed the pose) and publish time (when it entered the propagation layer). Receivers SHALL stamp receive time on arrival and SHALL NOT forward it. Producers SHALL carry a source-time uncertainty bound in seconds, using a declared default where uncalibrated.
+> Every 4D-State SHALL carry source time (when the producer produced or accepted the pose assertion) and publish time (when it entered the propagation layer). Receivers SHALL stamp receive time on arrival and SHALL NOT forward it. Producers SHALL carry a source-time uncertainty bound in seconds, using a declared default where uncalibrated. Raw observations reference externally produced evidence; they are not authoritative identity state.
 
 > **/req/core/sequence**
 > Each producer SHALL stamp records with a sequence number strictly monotonic per 4D-ID. Gap and reorder detection SHALL use sequence numbers, not timestamps.
@@ -231,7 +236,7 @@ This is the contract a vertical geocoder relies on: address plus floor plus unit
 > Uncertainty, where carried, SHALL be a 3×3 position covariance in the parent frame (six upper-triangular binary32 values, m²), an orientation standard deviation in radians or a 3×3 rotation-vector covariance, and a scalar confidence in [0, 1]. Absent uncertainty SHALL be treated as unknown, not zero.
 
 > **/req/core/provenance**
-> Provenance, where carried, SHALL identify the producing system, the sensing or generation method, the registration RMS error in meters, the registration tier (**logical**: linked but not spatially registered; **navigational**: placed well enough to view and transition; **metric**: survey-grade for measurement), and the time of last registration against the parent. A state fused from several sources SHALL additionally carry the supporting observation references (15.1), the fusion authority, the fusion model and version, an identity confidence in [0, 1], and a state confidence in [0, 1]. State, relations, or events produced by an automated agent SHALL additionally carry the agent identifier, run identifier, task identifier, model and version, the input snapshot (16.5), evidence references, confidence, and approval status.
+> Provenance, where carried, SHALL identify the producing system, the sensing or generation method, the externally supplied registration RMS error in meters, the registration tier (**logical**: linked but not spatially registered; **navigational**: placed well enough to view and transition; **metric**: survey-grade for measurement), and the time of the last externally supplied registration result against the parent. The family records registration results; it does not compute registration. A state fused from several sources SHALL additionally carry the supporting observation references (15.1), the fusion authority, the fusion model and version, an identity confidence in [0, 1], and a state confidence in [0, 1]. State, relations, or events produced by an automated agent SHALL additionally carry the agent identifier, run identifier, task identifier, model and version, the input snapshot (16.5), evidence references, confidence, and approval status.
 
 One authoritative 4D-State, many contributing sensors, and a consumer can ask why the system believes what it believes.
 
@@ -250,18 +255,18 @@ One authoritative 4D-State, many contributing sensors, and a consumer can ask wh
 > An entity MAY carry human-readable labels, each localized and each with source, validity, and provenance. Labels MAY change and SHALL NOT determine identity; `identified_as` (below) remains the mechanism for authoritative external identifiers.
 
 > **/req/core/promotion**
-> Content produced by inference or automation (a detected object, an inferred relation, a proposed change) SHALL enter as an observation (15.1), a provisional identity, an event (9.4), or scenario-domain content (17.1), and SHALL become authoritative state in the Earth domain only through an authenticated promotion by the responsible authority (12.1). Automation proposes; authority promotes.
+> Content produced by inference or automation (a detected object, an inferred relation, a proposed change) SHALL enter as an observation/evidence record, candidate evidence, event (9.4), or scenario-domain content (17.1). After the resolve-first check, a resolver MAY mint a provisional identity only when no acceptable existing match exists; any such identity SHALL become authoritative state in the Earth domain only through authenticated promotion by the responsible authority (12.1). Automation proposes; authority promotes.
 
 > **/req/core/relation**
 > An entity MAY carry typed relations to other 4D-IDs. Each relation SHALL carry a type, a validity interval, a confidence in [0, 1], and provenance. This family defines six types: `proxy_of` (17.3), `portal` (17.2), `corresponds_to` (17.6), `observed_by` (15.1), `represents`, and `identified_as`; further types come from the namespaced taxonomy of 9.4. A relation SHALL NOT imply a transform and SHALL NOT participate in composition, traversal, depth, or cycle detection.
 
 > **/req/core/represents**
-> A `represents` relation links a representation entity (a point cloud, splat, mesh, panorama set, BIM model, or tileset, each with its own LCS and registration) to the entity it depicts. It SHALL carry the representation kind, capture time, level of detail, registration quality and tier (7.8), and a license reference, and MAY carry a validity window and a `supersedes` reference to an older representation it replaces. The registration tier (7.8) applies to exterior representations as it does to interior ones: a survey-grade facade scan is metric, a photogrammetric city tileset is typically navigational, and a device SHOULD prefer the highest-tier representation available for localization and surface the tier when a lower one is used. A representation SHALL NOT be a proxy: it attaches geometry; it does not derive pose. A consumer resolving an entity's representations SHALL, absent a request for history, select the current one by validity and capture time.
+> A `represents` relation links a representation entity (a point cloud, splat, mesh, panorama set, BIM model, or tileset, each with its own LCS and externally supplied registration result) to the entity it depicts. It SHALL carry the representation kind, capture time, level of detail, registration quality and tier (7.8), and a license reference, and MAY carry a validity window and a `supersedes` reference to an older representation it replaces. The registration tier (7.8) is recorded provenance; a consumer MAY prefer the highest-tier representation available as input to an external localization service and SHALL surface the tier when a lower one is used. A representation SHALL NOT be a proxy: it attaches geometry; it does not derive pose. A consumer resolving an entity's representations SHALL, absent a request for history, select the current one by validity and capture time.
 
 > **/req/core/identified-as**
-> An `identified_as` relation records an identifier for the entity in an external registry (a parcel number, an asset tag, an IFC GlobalId, a CityGML id, a scan vendor's model id, a tileset feature id, a place id). It SHALL carry the registry name and the identifier. Ingestion of external data SHALL resolve through `identified_as` before minting, so one place never receives two identities because two vendors named it.
+> An `identified_as` relation records an identifier for the entity in an external registry (a parcel number, an asset tag, an IFC GlobalId, a CityGML id, a scan vendor's model id, a tileset feature id, a place id). It SHALL carry the registry name and the identifier. Ingestion SHALL first attempt resolution using an exact/authorized external identifier and any resolver candidate records. If an acceptable existing identity is found, it SHALL be reused; only when no acceptable match exists may minting proceed. Vendor labels alone SHALL not establish identity.
 
-Containment and attachment are expressed by the tree, not by relations. The relation graph is what planners and AI reason over; the tree is what renderers and controllers compose. A facility with a parcel record, an IFC model, three LiDAR scans, a panorama capture, and an exterior tileset is one identity with several `identified_as` and several `represents` relations.
+Containment and attachment are expressed by the tree, not by relations. The relation graph is what planners and AI reason over; the tree is what renderer/controller clients consume for composition. Candidate associations, if exposed separately by a resolver, are non-authoritative evidence and SHALL NOT change identity or state. A facility with a parcel record, an IFC model, three LiDAR scans, a panorama capture, and an exterior tileset is one identity with several `identified_as` and several `represents` relations.
 
 ## 8. Alignment
 
@@ -296,7 +301,7 @@ Informative. The motion and history extensions convert losslessly to OGC Moving 
 | `/conf/core/composition` | F | Compare cached global poses to a chain walk over 10,000 entities; move a parent with 10,000 children; verify correct poses and no cache through the moving parent. |
 | `/conf/core/uniform-scale` | F | Compose through a 1:1000 embedding; verify scaling of velocity and covariance; verify shear rejected. |
 | `/conf/core/uncertainty` | D | Validate covariance layout and confidence range. |
-| `/conf/core/provenance` | D | Validate provenance fields; for a fused state, validate supporting observations, fusion authority and model, identity and state confidence. |
+| `/conf/core/provenance` | D | Validate provenance fields; verify externally supplied registration metadata is recorded; for a fused state, validate supporting observations, fusion authority and model, identity and state confidence. |
 | `/conf/core/lifecycle` | F | Take an entity through lost_contact and back; verify records accepted on return; drive it to terminal by authenticated termination; verify subsequent records rejected. |
 | `/conf/core/structural-history` | F | Add a wing to a building; verify same 4D-ID, generation increment, history event. |
 | `/conf/core/derivation` | F | Fork an entity; verify new 4D-ID with derivation; verify prior resolvable. |
@@ -304,7 +309,7 @@ Informative. The motion and history extensions convert losslessly to OGC Moving 
 | `/conf/core/promotion` | F | Submit agent-generated content directly as Earth-domain state; verify refusal; promote with authority; verify acceptance and provenance. |
 | `/conf/core/relation` | D, F | Validate type, validity, confidence, provenance; add relations forming a cycle; verify composition and cycle detection unaffected. |
 | `/conf/core/represents` | D, F | Attach a splat and a BIM model to one unit; validate kind, capture time, LOD, registration, tier, license; supersede one; verify the current one is selected absent a history request; verify neither alters the unit's pose. |
-| `/conf/core/identified-as` | F | Ingest the same facility from two registries; verify one identity with two `identified_as` relations. |
+| `/conf/core/identified-as` | F | Ingest the same facility from two registries; verify existing-identity reuse and two `identified_as` relations; verify ambiguous candidates do not mint and a no-acceptable-match result permits authorized minting. |
 | `/conf/core/dggs-variant` | F | Exchange records at two resolutions; verify coercion and indicator. |
 | `/conf/core/geopose` | D | Convert an LCS pose to GeoPose Basic and back; verify identity to 1e-9 relative. |
 
@@ -313,13 +318,13 @@ Informative. The motion and history extensions convert losslessly to OGC Moving 
 The access operations of Clause 10 are one semantic API with many bindings. None of the bindings below is normative.
 
 ### B.1 Khronos OpenXR
-**Proposed `XR_EXT_spatial_entity_4did`.** `xrGet4DIDForSpatialEntityEXT` returns (minting if needed) the 4D-ID of a runtime spatial entity or anchor. `xrCreateSpaceFrom4DIDEXT` resolves a 4D-ID to an `XrSpace`. `xrGet4DStateEXT` returns the 4D-State for a space at a predicted display time. The runtime's reference space is an LCS whose parent is the nearest anchored 4D-ID; because of 5.3 the axis mapping is identity.
+**Possible `XR_EXT_spatial_entity_4did`.** `xrGet4DIDForSpatialEntityEXT` submits an external grounding result or explicit authorized mint request and returns the resolved 4D-ID of a runtime spatial entity or anchor; resolution first checks existing identities. `xrCreateSpaceFrom4DIDEXT` resolves a 4D-ID to an `XrSpace`. `xrGet4DStateEXT` returns the 4D-State for a space at a predicted display time. The runtime's reference space is an LCS whose parent is the nearest anchored 4D-ID; because of 5.3 the axis mapping is identity.
 
 ### B.2 Khronos glTF
-**Proposed `EXT_4did_anchor`.** A node-level extension carrying `id`, `parent`, `anchorTransform` (16 floats, column-major, node to parent LCS), `motionMode`, and `registration`. A scene-level anchor with unanchored children implies LCS-local children. 3D Tiles tilesets carry the same object at tileset and content level.
+**Possible `EXT_4did_anchor`.** A node-level extension carrying `id`, `parent`, `anchorTransform` (16 floats, column-major, node to parent LCS), `motionMode`, and externally supplied `registration` metadata. A scene-level anchor with unanchored children implies LCS-local children. 3D Tiles tilesets carry the same object at tileset and content level; the binding carries registration results and does not calculate them.
 
 ### B.3 Model Context Protocol
-The stateless MCP core routes each request on its own headers, returns cache hints on list and resource reads, and recommends explicit handles returned by tools and passed back as arguments over transport-hidden state. A 4D-ID and a snapshot id are such handles. Mapping: `4did:` identifiers are MCP resources; the Clause 10 operations are tools with JSON Schema inputs and outputs; long-running work (ingesting a scan, registering a reconstruction, generating a scenario domain) uses MCP Tasks; the context envelope (10.6) is the default tool result for an entity. MCP carries context, discovery, queries, and actions. It does not carry the 4D-State stream (13); robots, headsets, vehicles, and renderers stay on that path.
+The stateless MCP core routes each request on its own headers, returns cache hints on list and resource reads, and recommends explicit handles returned by tools and passed back as arguments over transport-hidden state. A 4D-ID and a snapshot id are such handles. Mapping: `4did:` identifiers are MCP resources; the Clause 10 operations are tools with JSON Schema inputs and outputs; long-running work (ingesting an externally grounded scan/result, recording an externally registered reconstruction, generating a scenario domain) uses MCP Tasks; the context envelope (10.6) is the default tool result for an entity. MCP carries context, discovery, queries, and actions. It does not carry the 4D-State stream (13); robots, headsets, vehicles, and renderer clients stay on that path. MCP operations expose resolver/query and candidate-recording functions only; they do not perform perception, matching, localization, registration, or rendering.
 
 ### B.4 Agent-to-agent delegation
 Where one agent hands work to another, the delegated task carries a target 4D-ID, a snapshot id (16.5), a policy scope, and evidence references, so both agents refer to exactly the same entity at the same version of the world. The pattern is protocol-independent.
@@ -361,6 +366,7 @@ Twelve decisions a reviewer is likely to contest, with the alternative rejected 
 
 | Version | Change |
 |---|---|
+| Unreleased | Boundary clarification: grounding determines the referent, localization determines where, and 4D-ID preserves resolved identity continuity; observations are evidence; resolution is existing-identity-first and minting follows only when no acceptable match exists; externally supplied candidate associations and authorized lifecycle decisions may be recorded by resolvers; perception, matching/re-identification/SEGS, localization, registration, and rendering remain external. |
 | 2.3 | Clause 10 rewritten as access operations (one semantic API, many bindings) with relation and event queries, purpose-based representation negotiation, snapshot access, watch, and a bounded context envelope. P5 requires `semantics`. Labels (non-identity) and the promotion rule (automation proposes, authority promotes) in 7.9; agent-run provenance in 7.8. MCP and agent-delegation bindings in Annex B. Feature-vector depth field bounded. Family map, scope pointers, and depth wording corrected. Part 6 gains agent pattern and developer package. |
 | 2.2 | `localization` affordance and quality (9.4); registration tier on exterior representations (7.9); overlay-confidence rule (18.5). |
 | 2.1 | `presentation` class: viewpoints, LOD ladder, transition hints, continuity anchors (Clause 18). Registration tier added to provenance (7.8). `represents` gains validity and `supersedes` (7.9). Implementation guide gains the logical-jump navigation pattern. Rationale entry on representations sharing identity rather than being joined. |

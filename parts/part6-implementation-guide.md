@@ -1,13 +1,13 @@
 # 4D-ID 2.3, Part 6: Implementation guide
 
-**Unified Spatiotemporal Identity for Shared Reality. Informative Part 6 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Informative Candidate Open Standard Working Draft, Part 6 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
 | Version | 2.3 (working draft) |
 | Date | September 2026 |
-| Status | Informative. Nothing in this Part is required for conformance. |
+| Status | Informative candidate working draft. Nothing in this Part is required for conformance. |
 
 ## G.1 Purpose
 
@@ -59,9 +59,9 @@ Parts 1 to 5 carry only requirements without which two implementations would not
 
 ## G.8 Representations and the built environment (supports 7.6, 7.9, 17.1)
 
-- **Ingest by external identifier first.** Resolve every incoming record (parcel, asset register, IFC, CityGML, scan vendor, tileset feature, place id) through `identified_as` before minting. Duplicate identities are the most expensive mistake a twin makes, and they are made at ingestion.
-- **Let BIM be the hierarchy where it exists.** IFC is already a transform tree: IfcBuildingStorey to floor, IfcSpace to unit and room, IfcWindow and IfcDoor to fixtures, IfcLocalPlacement to LCS transforms, GlobalId to `identified_as`. Mint from BIM and register scans to it; where no BIM exists, the scan-derived tree becomes the record and a later BIM registers to that.
-- **Windows and doors are the registration anchors.** The same opening seen from outside (facade segmentation on an exterior tileset) and from inside (interior LiDAR or splat) is one entity. Re-identify interior openings against exterior ones by facade position within tolerance, merge if two pipelines minted separately, and solve the interior scan's LCS pose from three or more matched openings. Registration quality then rides in provenance, and exterior and interior agree by construction.
+- **Resolve identifiers and candidates first.** Resolve every incoming record (parcel, asset register, IFC, CityGML, scan vendor, tileset feature, place id) against exact external identifiers, existing identities, and resolver candidate records before minting. Mint only after no acceptable match, subject to authorization. Duplicate identities are the most expensive mistake a twin makes, and they are made at ingestion.
+- **Let BIM be the hierarchy where it exists.** IFC is already a transform tree: IfcBuildingStorey to floor, IfcSpace to unit and room, IfcWindow and IfcDoor to fixtures, IfcLocalPlacement to LCS transforms, GlobalId to `identified_as`. Resolve or declare BIM entities after the same check; submit externally computed scan-to-entity registration results to the resolver. Where no BIM exists, the scan-derived tree becomes the record and a later BIM submits its externally computed registration result.
+- **Windows and doors are useful external correspondence anchors.** Use external grounding/matching/re-identification/SEGS and registration services for correspondence. Submit their candidate matches, evidence, confidence, and externally computed transforms to the resolver. The resolver records candidates; only an authorized decision may reuse or merge identities. 4D-ID stores the accepted result and provenance but does not perform matching or registration.
 - **Floor index from height.** Facade window rows divided by declared slab height give physical floor index; the floor's display label is a separate field, because thirteen is skipped, ground is 0 in one city and 1 in another, and mezzanines exist.
 - **Cut representations per room.** Splat clusters and meshes split per room carry their own `represents` relation and level of detail, so a client loads the room it is in.
 - **Exterior to interior is a level-of-detail switch, not a portal.** Resolve the building, follow `represents`, choose by the visibility query's LOD hint, viewer capability, credential, and license. Because interior and exterior windows share identity, the swap does not jump. A license field on `represents` is what tells a client that a commercial tileset may be streamed but never cached into an almanac.
@@ -72,7 +72,7 @@ Parts 1 to 5 carry only requirements without which two implementations would not
 Do not join the regional tileset, the site capture, and the interior scan into one continuous model. They differ in time, resolution, accuracy, vendor, and license, and joining them reconciles errors that resist reconciliation while costing the most at exactly the moment the user is moving. Resolve one identity down its hierarchy and hand off between representations instead.
 
 - **One representation in view at a time.** Regional tiles at altitude, site capture at the perimeter, a single space's scan inside. Prefetch the next rung of the ladder (18.2) so the handoff has no load stall.
-- **Solve geometry once, offline.** The interior-to-exterior registration is computed at ingestion and stored as the scan LCS pose with its residual and tier (7.8). At runtime a client reads a cached transform; it never re-registers live geometry.
+- **Obtain or compute registration externally before ingestion.** Store the externally computed interior-to-exterior transform, residual, and tier (7.8) as provenance. At runtime a client reads a cached transform; the candidate draft/client must not re-register live geometry.
 - **Let the continuity anchor carry the cut.** Place the outgoing and incoming cameras relative to the anchor entity (18.3). Because the anchor is one identity with a pose in each representation, the fade lands on the same point. An opening is the ideal anchor between an exterior facade and an interior scan. This is what makes the leap feel like moving through the door rather than cutting to a slideshow.
 - **Match the tier to the task.** Navigation and transitions run on logical or navigational registration; measurement and fit require metric (18.4). Ship the fluid experience before every unit is survey-registered, deferring the expensive solve until someone needs to measure.
 - **Resolve to the freshest representation.** Follow `supersedes` and validity (7.9) so a stale interior is never shown as current unless history is requested.
@@ -82,7 +82,7 @@ Do not join the regional tileset, the site capture, and the interior scan into o
 
 1. Client shows the regional tileset; user selects a facility. Resolve the facility identity; read its LOD ladder.
 2. Ladder rung 2 is the facility's approach viewpoint (18.1) framing the facade; camera flies there; exterior representation streams.
-3. User selects a loading door. That door is one identity (re-identified from facade and interior scan, G.8). The transition hint (18.3) names it as the continuity anchor.
+3. User selects a loading door. An external matching service grounds the facade and interior evidence to a candidate door; an authorized resolver accepts and records the result. The transition hint (18.3) names that identity as the continuity anchor.
 4. Client positions the interior camera relative to the door's pose in the bay's scan, crossfades, and the door holds screen position. The bay scan is now in view; the exterior tileset is released.
 5. Measurement in the bay switches to the metric-tier BIM or registered scan (18.4); browsing stays on the scan.
 
@@ -117,7 +117,7 @@ Numbered for reference; none is required for conformance.
 7. Standards-body track: OGC extension, joint OGC and Khronos item, independent, or permissively licensed. This decision shapes the others.
 8. Semantic taxonomy and affordance vocabulary; discrete-state semantics; many-to-one and one-to-many views.
 9. Normative definition of the `oct` grid and criteria for other synthetic grids.
-10. Entity-resolution reference algorithms and confidence semantics, including learned re-identification.
+10. External entity-resolution/re-identification interoperability and confidence semantics; no reference matcher in this family.
 11. Authority election protocols for ad hoc co-located groups; nested local authority.
 12. Relay topology and hot-zone splitting parameters; density forecasting inputs and their privacy implications.
 13. Importance model for priority budgets.
@@ -136,18 +136,18 @@ Wire formats (JSON Schema, a binary form, and API surface) are deferred to a com
 
 Actuation stays outside this family (17.3); a tool acts *on* a 4D-ID. The loop an agent runs:
 
-1. **Identify.** `resolve` an external identifier or a selection to a 4D-ID.
+1. **Identify.** Resolve exact external identifiers or submit externally generated candidate/grounding evidence to a resolver; a UI selection is not itself identity. `resolve` returns an accepted 4D-ID, candidate records, or a signed no-match result.
 2. **Understand.** `context` returns a bounded envelope (10.6): class, labels, pose, affordances, relations, representations, provenance, constraints, all at a snapshot.
 3. **Reason.** Follow `get_relations` and `query_events` as needed; never load geometry unless a representation is required for the purpose.
 4. **Act.** Call a tool with the 4D-ID as the target (`inspect(door)`, `navigate_to(dock)`, `schedule(asset)`), scoped to the same snapshot and a policy scope.
 5. **Observe.** The action's result returns as an observation or an event with agent-run provenance (7.8).
-6. **Update.** Proposed changes enter as observations, provisional identities, events, or scenario content and become authoritative only by promotion (7.9).
+6. **Update.** Proposed changes enter as observations, candidate records, provisional identities only after no acceptable match, events, or scenario content and become authoritative only by authenticated promotion (7.9).
 
 Delegation between agents carries the target 4D-ID, the snapshot, the policy scope, and evidence references (Part 1, B.4), so every agent in the chain refers to the same entity at the same version of the world.
 
 ### Developer package
 
-Adoption is bounded by the first afternoon. The companion package, produced with the reference implementation, comprises: JSON Schema for every record in Parts 1 to 5; an OpenAPI 3.1 description of the Clause 10 operations; a reference MCP server exposing them (B.3); TypeScript and Python SDKs; a containerized resolver; a conformance command-line tool that runs every Annex A test; and sample data for a multi-representation facility. Thin adapters follow for IFC and BIM, ROS 2 tf2 and VDA 5050, glTF, 3D Tiles, OpenXR, and the major engines. The first experience should be four calls:
+Evaluation can begin in an afternoon. The companion package currently includes JSON Schema for records in Parts 1 to 5, an OpenAPI 3.1 description of the Clause 10 operations, a JavaScript SDK, a containerized candidate-recording/resolution service, conformance diagnostics, and sample data. Exactly 15 schema-level checks currently pass; broader functional conformance work continues. The IFC adapter is implemented; ROS 2 tf2, VDA 5050, glTF, 3D Tiles, OpenXR, major-engine adapters, MCP, and other SDKs remain planned unless their repositories say otherwise. These are external tools and clients consuming 4D-ID; the family does not provide a perception, matching, localization, registration, or rendering stack. The first experience should be four calls:
 
 ```
 resolve(registry, id)      -> 4did:…
