@@ -4,7 +4,7 @@
 
 [![License: OGC / Apache-2.0](https://img.shields.io/badge/license-open-blue.svg)](#license)
 [![Status: Working Draft](https://img.shields.io/badge/status-working%20draft%202.3-green.svg)](#status)
-[![Try it live](https://img.shields.io/badge/try-x4d--id.exe.xyz-4dd0c4.svg)](https://x4d-id.exe.xyz/)
+[![Try it live](https://img.shields.io/badge/try-4d--id.org-4dd0c4.svg)](https://4d-id.org/)
 
 4D-ID gives every object, surface, agent, and environment, physical or virtual, one persistent identity that survives movement, re-observation, vendor boundaries, and the boundary between real and virtual. It is an identity and addressing layer over the standards the world already uses (OGC GeoPose and DGGS, ISO 8601, OpenXR, glTF), not a new coordinate system.
 
@@ -29,7 +29,7 @@ The **reference implementation** (a resolver you can run in an afternoon), the *
 
 - [`reference-resolver`](https://github.com/4d-id/reference-resolver) — the resolver, Apache-2.0
 - [`js-sdk`](https://github.com/4d-id/js-sdk) — the TypeScript / JavaScript client
-- [`demos`](https://github.com/4d-id/demos) — interactive browser demos, also live at [x4d-id.exe.xyz](https://x4d-id.exe.xyz/)
+- [`demos`](https://github.com/4d-id/demos) — interactive browser demos, also live at [4d-id.org](https://4d-id.org/)
 
 ## Read it
 
@@ -50,7 +50,7 @@ A requirement is in the standard only if two independent implementations would f
 
 ## Try it before you read it
 
-An interactive resolver, an address-to-identity globe, and animated demos (a robot and drone in a named building; a ship of named containers) run at **[x4d-id.exe.xyz](https://x4d-id.exe.xyz/)**.
+An interactive resolver, an address-to-identity globe, and animated demos (a robot and drone in a named building; a ship of named containers) run at **[4d-id.org](https://4d-id.org/)**.
 
 ## Status
 
