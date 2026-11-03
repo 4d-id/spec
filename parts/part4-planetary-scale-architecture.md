@@ -1,13 +1,13 @@
-# 4D-ID 2.3, Part 4: Planetary-scale architecture
+# 4D-ID 2.4, Part 4: Planetary-scale architecture
 
-**Unified Spatiotemporal Identity for Shared Reality. Candidate Open Standard Working Draft, Part 4 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Working draft offered for community review, Part 4 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
-| Version | 2.3 (working draft) |
-| Date | September 2026 |
-| Status | Candidate open standard working draft, offered for community review. Not adopted by any standards body. |
+| Version | 2.4 (working draft) |
+| Date | November 3, 2026 |
+| Status | Working draft offered for community review. Not adopted by any standards body. |
 
 ## Abstract
 
@@ -97,10 +97,10 @@ Identity is global; state is local. Resolution follows the shape that DNS and ce
 > A deployment SHALL partition each domain into zones at a *declared* resolution. Each zone SHALL have one authoritative resolver. Delegation to finer sub-zones SHALL be discoverable from the parent zone.
 
 > **/req/fabric/home-register**
-> The zone containing an entity's genesis anchor is its home zone and SHALL maintain the identifier of the zone currently holding the entity's state. A zone accepting an entity SHALL notify the home zone within the entity's validity window. Resolution of any 4D-ID is therefore home zone (parsed from the identifier) to current zone to state; no global index is required or assumed.
+> For legacy spatial identifiers, the zone containing the genesis anchor is the home zone. For variant `id`, a deployment SHALL publish or configure a discoverable, non-spatial mapping from opaque home tokens to home registers, with its delegation, update, and availability policy *declared*; the token SHALL NOT be decoded into a place or domain. Both forms SHALL retain a home register that identifies the zone currently holding the entity's state. A zone accepting an entity SHALL notify its home register within the entity's validity window. Resolution is home register to current zone to state; current location comes from state, not the identifier. A global spatial index is not required or assumed, and an unavailable token mapping SHALL produce an incomplete lookup, not a no-match. Mapping changes SHALL preserve existing identifiers and resolution continuity.
 
 > **/req/fabric/caching**
-> Resolvers SHALL cache positive and negative responses with TTLs *declared* by the authoritative zone and SHALL serve recursive resolution so consumers never contact zone authorities directly.
+> Resolvers SHALL cache positive and negative responses with TTLs *declared* by the authoritative zone and SHALL serve recursive resolution so consumers never contact zone authorities directly. A reconciliation negative SHALL retain its scope, authority, completion and exhaustion indicators, evidence, and expiry (7.10); its cache TTL SHALL NOT exceed that expiry. An incomplete or failed lookup SHALL NOT become a cached no-match.
 
 ### 14.2 Handoff
 
@@ -115,6 +115,19 @@ Identity is global; state is local. Resolution follows the shape that DNS and ce
 > **/req/fabric/local-first**
 > A deployment SHALL designate local authority zones (a vehicle, a cell of a factory, a room, a session) within which the local authority is authoritative in real time. Remote and cloud components SHALL reconcile afterward and SHALL NOT be in the control loop of a local authority zone. Authority transfer SHALL emit a structural update carrying the new producer identifier and a generation increment (16.4); the election and transfer mechanism is *declared*.
 
+### 14.4 Conferred authority, overlapping authority, and disputes
+
+Authority is scoped attribution, not ownership of reality. A registrar, operator, owner, surveyor, or delegated service may speak for different subjects, fields, places, and intervals. The single-writer rule for accepted composition state (14.3) remains in force. Authority identifiers, role names, grant references, confidence, and decision statuses are attribution, not proof. Authentication and authorization mechanisms remain deployment policy subject to Clause 12; supplying a field or a purported grant does not authenticate or authorize its bearer.
+
+> **/req/fabric/conferred-authority**
+> A claim of conferred authority SHALL record the conferring principal, receiving principal, grant/delegation reference and provenance, permitted operations and subject/field/domain scope, validity interval, status, and revocation or supersession reference where applicable. A receiver SHALL evaluate the claim under its *declared* authentication and authorization policy before accepting an operation; it SHALL NOT treat authority fields alone as proof. Out-of-scope, expired, revoked, or unverified grants SHALL NOT authorize writes. A transfer affecting accepted frame state SHALL follow 14.3 and preserve structural history. Disclosure of grant evidence remains subject to Clause 11.
+
+> **/req/fabric/overlapping-authority**
+> Where authority claims overlap, a resolver SHALL preserve each claim's principal, scope, validity, provenance, and status, and SHALL apply a *declared*, deterministic precedence or delegation policy for each accepted write scope. Claims in disjoint scopes MAY coexist. Overlap SHALL NOT create a second composition parent or multiple simultaneous accepted writers for the same frame. An unresolved overlap for the same scope SHALL be surfaced as a conflict with the competing claims and policy reference, not silently resolved by arrival order or confidence. No disputed replacement SHALL overwrite accepted state before an authorized decision; previously accepted state MAY remain readable with the conflict and freshness explicitly marked.
+
+> **/req/fabric/dispute**
+> A dispute record SHALL identify the disputed identity, claim or decision; the raising principal; evidence references and provenance; the responsible reviewing authority; policy and scope; opening time, review limit and expiry; and status (`open`, `under_review`, `resolved`, `rejected`, or `expired`). A disposition SHALL record the attributed decision maker, reason, evidence, time, and any superseded decision reference. Resolvers SHALL expose unresolved disputes and their effect on acceptance to authorized consumers, retain prior decisions under the declared retention policy, and SHALL NOT treat a filing, candidate, or expired review period as an automatic merge, mint, termination, transfer, or state overwrite. Only a separately authenticated and authorized lifecycle or authority operation MAY enact a disposition. An unresolved expired dispute SHALL remain marked unresolved/expired, not become silent approval. The dispute mechanism records competing claims; it does not perform external grounding or adjudicate legal ownership.
+
 ## 15. Identity lifecycle (requirements class: `lifecycle`)
 
 Perception services may produce detections by the thousand per second; virtual content is created by anyone and forgotten by everyone. These rules keep the identity space clean.
@@ -122,7 +135,7 @@ Perception services may produce detections by the thousand per second; virtual c
 ### 15.1 Observation and identity
 
 > **/req/lifecycle/observation**
-> An observation SHALL be treated as evidence only and SHALL NOT be propagated as identity state. Resolver/ingest SHALL first check exact identifiers and acceptable existing identities. External matching, grounding, re-identification, or SEGS services MAY submit candidate results, but those functions are not specified or run by this family. If an acceptable existing match exists, it SHALL be reused. Only when no acceptable match exists may an authorized resolver mint a new or provisional 4D-ID; creator-declared persistence is subject to the same check. Ambiguity SHALL produce candidate records and no automatic mint or merge. An identity minted below a *declared* confidence threshold SHALL be provisional until the threshold is crossed; its identity confidence is carried in provenance (7.8).
+> An observation SHALL be treated as evidence only and SHALL NOT be propagated as identity state. Resolver/ingest SHALL first check exact identifiers and acceptable existing identities. External matching, grounding, re-identification, or SEGS services MAY submit candidate results, but those functions are not specified or run by this family. If an acceptable existing match exists, it SHALL be reused. Only after a valid `no_acceptable_match` decision under 7.10 may an authorized resolver mint a new or provisional 4D-ID; creator-declared persistence is subject to the same check. Ambiguity SHALL produce candidate records and no automatic mint or merge. An identity minted below a *declared* confidence threshold SHALL be provisional until the threshold is crossed; its identity confidence is carried in provenance (7.8).
 
 > **/req/lifecycle/observation-record**
 > An observation exchanged as evidence SHALL carry a sensor identifier, source time and bound, pose in a stated frame, uncertainty, classification and confidence, an evidence hash, an expiry, and optionally a candidate 4D-ID supplied by an external matcher. The candidate is non-authoritative evidence and SHALL NOT change identity or state. An observation SHALL have no home register, lease, history, or relations other than `observed_by` from accepted identity state it supports, and SHALL expire without propagation.
@@ -132,7 +145,7 @@ A radar, a camera, a drone, and an operator may all produce evidence before anyo
 ### 15.2 Merge and split
 
 > **/req/lifecycle/merge**
-> When an authorized resolver decision, based on externally supplied evidence, determines that two 4D-IDs denote one entity, the survivor SHALL be the earlier genesis, and the merge SHALL be authenticated (12.1). Similarity or candidate evidence alone SHALL NOT merge identities. Each other SHALL move to merged with a derivation reference to the survivor, SHALL remain resolvable through its home register within retention, and SHALL redirect. Entities in different domains SHALL NOT be merged (17.6).
+> When an authorized resolver decision, based on externally supplied evidence, determines that two 4D-IDs denote one entity, the survivor SHALL be the earlier genesis where both identifiers carry comparable genesis instants, and the merge SHALL be authenticated (12.1). If either identifier uses `id` or the order cannot be established, the responsible authority SHALL record a deterministic survivor choice under a *declared* policy with evidence, provenance, and reason; it SHALL NOT infer time or place from an opaque token or remint a survivor. The survivor SHALL be one of the existing IDs. Similarity or candidate evidence alone SHALL NOT merge identities. Each other SHALL move to merged with a derivation reference to the survivor, SHALL remain resolvable through its home register within retention, and SHALL redirect. Entities in different domains SHALL NOT be merged (17.6).
 
 > **/req/lifecycle/split**
 > When an authorized resolver decision, based on externally supplied evidence, determines that one 4D-ID denotes several entities, new identities MAY be minted with derivation references to the original, whose continuation or termination SHALL be recorded in the derivation. Candidate evidence alone SHALL NOT split or mint identities.
@@ -211,14 +224,17 @@ A yard of containers is one record to a drone at a kilometer and thousands to a 
 | `/conf/propagation/failure-handling` | I, F | For each of fourteen classes, inject and verify documented handling. |
 | `/conf/propagation/replay` | F | Disconnect a producer; reconnect; verify ordered replay and reconciliation. |
 | `/conf/fabric/zone` | I, F | Verify zone resolution and discoverable delegation. |
-| `/conf/fabric/home-register` | F | Move an entity across three zones; verify home register updated within the validity window; verify two-hop resolution. |
-| `/conf/fabric/caching` | F | Resolve repeatedly; verify authority contacted once per TTL; verify negative caching. |
+| `/conf/fabric/home-register` | F | Move legacy and `id` entities across three zones; verify home-register updates and resolution through spatial home routing or declared opaque-token mapping. Change token mapping without changing IDs; make mapping unavailable and verify incomplete lookup, never no-match. |
+| `/conf/fabric/caching` | F | Resolve repeatedly; verify positive TTL and scoped negative caching bounded by decision expiry. Verify unavailable/incomplete/exhausted lookups never become cached no-match. |
 | `/conf/fabric/handoff` | F | Cross a zone boundary mid-stream; verify no loss and forwarding during grace. |
 | `/conf/fabric/single-writer` | F | Submit for one LCS from two producers; verify second rejected as `pose_conflict`. |
 | `/conf/fabric/local-first` | F | Sever the wide-area link; verify local zone continues at full rate; remove the authority; verify transfer with structural update. |
+| `/conf/fabric/conferred-authority` | I, D, F | Validate attributed grant, principals, scope, validity, provenance and status; accept a policy-verified in-scope grant, reject out-of-scope, expired, revoked and unverified grants. Verify bare authority fields confer no permission and transfers retain structural history. |
+| `/conf/fabric/overlapping-authority` | I, D, F | Accept disjoint scopes, exercise deterministic declared precedence, and surface unresolved overlapping claims with provenance. Verify no arrival-order winner, extra parent, second accepted writer, or silent state overwrite. |
+| `/conf/fabric/dispute` | D, F | File, review, resolve, reject and expire a dispute; validate parties, evidence, provenance, limits, reasons and history. Verify authorized consumers see unresolved status and that filing or expiry alone never mutates identity, authority or state. |
 | `/conf/lifecycle/observation` | F | Inject externally produced observations and candidate evidence for one object from three sources; verify evidence-only handling, existing-identity reuse, ambiguity without automatic mint/merge, and provisional status below threshold. |
 | `/conf/lifecycle/observation-record` | D, F | Validate evidence fields and optional externally supplied candidate 4D-ID; verify expiry without propagation and no home register or lease. |
-| `/conf/lifecycle/merge` | F | Submit externally supplied evidence and an authorized resolver decision; verify survivor, redirect, and rejection of new records to the merged identity; verify similarity/candidates alone do not merge; attempt cross-domain merge; verify refusal. |
+| `/conf/lifecycle/merge` | F | Submit externally supplied evidence and an authorized resolver decision; verify earlier-genesis survivor or documented deterministic existing survivor for `id`, redirect, and rejection of new records to the merged identity; verify similarity/candidates alone do not merge; attempt cross-domain merge; verify refusal. |
 | `/conf/lifecycle/split` | F | Split; verify derivation references. |
 | `/conf/lifecycle/lease` | F | Withhold renewal; verify terminal at expiry without producer action. |
 | `/conf/lifecycle/layer` | F | Two entities at one pose in two layers; verify no conflict and layer filtering. |

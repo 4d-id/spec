@@ -1,9 +1,9 @@
 # 4D-ID™ Specification
 
-**A persistent identifier for a resolved referent across systems and time.** A candidate open standard for spatial identity.
+**A persistent identifier for a resolved referent across systems and time.** A working draft offered for community review.
 
 [![License: OGC / Apache-2.0](https://img.shields.io/badge/license-open-blue.svg)](#license)
-[![Status: Candidate Open Standard Working Draft](https://img.shields.io/badge/status-candidate%20open%20standard%20working%20draft-green.svg)](#status)
+[![Status: Working draft offered for community review](https://img.shields.io/badge/status-working%20draft-blue.svg)](#status)
 [![Try it live](https://img.shields.io/badge/try-4d--id.org-4dd0c4.svg)](https://4d-id.org/)
 
 4D-ID gives each resolved object, surface, agent, and environment, physical or virtual, one persistent identity that can survive movement, re-observation, vendor boundaries, and the boundary between real and virtual. It is an identity and continuity layer over the standards the world already uses (OGC GeoPose and DGGS, ISO 8601, OpenXR, glTF), not a new coordinate system.
@@ -14,18 +14,25 @@ The web gave every document a name that worked across every browser and server. 
 
 > **Identities are shared and global, but what you can see and say about them is yours.**
 
+## Boundaries and the 2.4 model
+
+**OBSERVE -> GROUND -> IDENTIFY -> RESOLVE -> INTEROPERATE.** Observations are evidence; external grounding determines the referent and localization determines where; 4D-ID preserves which. SEGS is adjacent, not an in-family matcher. An acceptable existing identity is reused before any authorized mint.
+
+An entity has one composition parent and may carry many externally supplied registration records. Registrations neither add parents nor establish identity. DGGS routes, partitions, and filters; it is not the name. New `id`-variant identifiers use opaque, non-spatial home tokens and random descriptors without embedded place, person, or time. Legacy spatial IDs stay valid as mint/routing metadata; current anchors and accepted registrations determine location. The larger identifier/grid decision remains open for 2.5.
+
 ## This repository
 
-This is the **specification**: a candidate, versioned working-draft contract prepared for community review and possible future submission. Potential liaison targets include an OGC Standards Working Group and Khronos for the OpenXR and glTF bindings; this repository makes no adoption claim.
+This is the **specification**: a versioned working draft offered for community review and possible future submission. Potential liaison targets include an OGC Standards Working Group and Khronos for the OpenXR and glTF bindings; this repository makes no adoption claim.
 
 | Path | What it is |
 |---|---|
 | [`parts/`](parts/) | The specification, in six parts. Part 1 (Core) stands alone. |
-| [`schemas/`](schemas/) | JSON Schema 2020-12 for every record type. |
+| [`schemas/`](schemas/) | Partial JSON Schema 2020-12 record bindings. |
+| [`encoding/2.4.md`](encoding/2.4.md) | Versioned binding status, migration, and coverage limits. |
 | [`openapi/`](openapi/) | OpenAPI 3.1 description of the access operations (Clause 10). |
-| [`conformance/`](conformance/) | The conformance manifest: every test this candidate draft defines. |
+| [`conformance/`](conformance/) | The conformance manifest: every test this working draft defines. |
 | [`CHANGELOG.md`](CHANGELOG.md) | Notable changes per version. |
-| [`GOVERNANCE.md`](GOVERNANCE.md) | How this candidate draft is governed and possible future liaison paths. |
+| [`GOVERNANCE.md`](GOVERNANCE.md) | How this working draft is governed and possible future liaison paths. |
 
 The **reference implementation** (a resolver you can run in an afternoon), the **SDKs**, and the **conformance CLI** live in sibling repositories:
 
@@ -48,7 +55,7 @@ Start with **[Part 1: Core](parts/part1-core.md)**. It is about thirteen pages a
 
 ## The one rule of what is normative
 
-A requirement is in this candidate draft only if two independent implementations would fail to interoperate without it. About a hundred requirements survive that rule, each with a test. Everything else is guidance in Part 6.
+A requirement is in this working draft only if two independent implementations would fail to interoperate without it. Exactly 112 normative requirements survive that rule, each linked to an Annex A test and manifest entry. Defined tests are not claims of passing implementations. Everything else is guidance in Part 6.
 
 ## Try it before you read it
 
@@ -56,7 +63,17 @@ External clients and demos—including an interactive resolver, an address-to-id
 
 ## Status
 
-Candidate Open Standard Working Draft 2.3. No standards body has adopted this draft. Offered for community review; see [GOVERNANCE.md](GOVERNANCE.md) for possible future paths.
+**Version 2.4, November 3, 2026: working draft offered for community review.** No standards body has adopted this draft. See [GOVERNANCE.md](GOVERNANCE.md) for possible future paths.
+
+## Validate the artifacts
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r conformance/requirements.txt
+.venv/bin/python conformance/validate.py
+```
+
+Validation checks schema and OpenAPI validity, local/versioned references, positive and negative JSON fixtures, and exact one-to-one linkage among 112 requirements, Annex A tests, and manifest entries. Wired schema checks are partial, not functional conformance; see [encoding/2.4.md](encoding/2.4.md).
 
 ## Contributing
 
@@ -66,4 +83,4 @@ Review the draft and open an issue or a change request. See [CONTRIBUTING.md](CO
 
 The specification text is offered under an open documentation license for community review. The reference implementation, SDKs, schemas, and conformance suite are licensed **Apache-2.0**. See [LICENSE](LICENSE).
 
-The identifier format is permissionless to generate, but conforming resolution follows existing-identity-first: resolve an acceptable existing identity before minting; mint only when no acceptable match exists, subject to the lifecycle and authority rules. This candidate draft is designed for royalty-free publication and implementation.
+The identifier format is permissionless to generate, but conforming resolution follows existing-identity-first: resolve an acceptable existing identity before minting; mint only after a completed, bounded, scoped and unexpired no-acceptable-match decision, subject to the lifecycle and authority rules. Incomplete or exhausted lookup is not no-match. This working draft is designed for royalty-free publication and implementation.

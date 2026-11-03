@@ -1,13 +1,13 @@
-# 4D-ID 2.3, Part 6: Implementation guide
+# 4D-ID 2.4, Part 6: Implementation guide
 
-**Unified Spatiotemporal Identity for Shared Reality. Informative Candidate Open Standard Working Draft, Part 6 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Informative working draft offered for community review, Part 6 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
-| Version | 2.3 (working draft) |
-| Date | September 2026 |
-| Status | Informative candidate working draft. Nothing in this Part is required for conformance. |
+| Version | 2.4 (working draft) |
+| Date | November 3, 2026 |
+| Status | Working draft offered for community review. Informative only. Nothing in this Part is required for conformance. |
 
 ## G.1 Purpose
 
@@ -24,7 +24,7 @@ Parts 1 to 5 carry only requirements without which two implementations would not
 - Schedule periodic keyframes at a phase derived from the entity handle so refresh load is uniform across the interval.
 - Batch producers in one LCS on a shared tick with delta-encoded timestamps and a shared header. A room of thirty sensors, or a vehicle's dozen, becomes one packet per tick.
 - Encode deltas against the last keyframe the consumer acknowledged, as video codecs and game netcode do.
-- Within an LCS of known extent, 16-bit fixed-point positions give millimeter precision over 65 m; smallest-three quaternion packing gives 32-bit orientation. A hot pose drops from 56 bytes to 10. These belong to the Encoding Standard.
+- Within an LCS of known extent, 16-bit fixed-point positions give millimeter precision over 65 m; smallest-three quaternion packing gives 32-bit orientation. A hot pose drops from 56 bytes to 10. These are possible future binary encodings, not part of the current [2.4 binding](../encoding/2.4.md).
 - Keep a fixed-width hot record (pose, velocity, sequence, source time, confidence, flags, at most 128 bytes) separate from cold metadata (provenance, extensions, references) reached by handle.
 
 ## G.4 Fan-out (supports 13.2, 16.6)
@@ -59,7 +59,8 @@ Parts 1 to 5 carry only requirements without which two implementations would not
 
 ## G.8 Representations and the built environment (supports 7.6, 7.9, 17.1)
 
-- **Resolve identifiers and candidates first.** Resolve every incoming record (parcel, asset register, IFC, CityGML, scan vendor, tileset feature, place id) against exact external identifiers, existing identities, and resolver candidate records before minting. Mint only after no acceptable match, subject to authorization. Duplicate identities are the most expensive mistake a twin makes, and they are made at ingestion.
+- **Resolve identifiers and candidates first.** Resolve every incoming record (parcel, asset register, IFC, CityGML, scan vendor, tileset feature, place id) against exact external identifiers, existing identities, and resolver candidate records before minting. Mint only after a completed, scoped, unexpired `no_acceptable_match` decision (7.10), subject to authorization. Duplicate identities are the most expensive mistake a twin makes, and they are made at ingestion.
+- **Keep one parent and many registrations.** Retain independent external transforms into BIM, scan, device-map, and survey frames in `state.registrations`, each with its own evidence, quality, validity, and status. Compose through the one accepted parent only; do not solve disagreements inside the resolver.
 - **Let BIM be the hierarchy where it exists.** IFC is already a transform tree: IfcBuildingStorey to floor, IfcSpace to unit and room, IfcWindow and IfcDoor to fixtures, IfcLocalPlacement to LCS transforms, GlobalId to `identified_as`. Resolve or declare BIM entities after the same check; submit externally computed scan-to-entity registration results to the resolver. Where no BIM exists, the scan-derived tree becomes the record and a later BIM submits its externally computed registration result.
 - **Windows and doors are useful external correspondence anchors.** Use external grounding/matching/re-identification/SEGS and registration services for correspondence. Submit their candidate matches, evidence, confidence, and externally computed transforms to the resolver. The resolver records candidates; only an authorized decision may reuse or merge identities. 4D-ID stores the accepted result and provenance but does not perform matching or registration.
 - **Floor index from height.** Facade window rows divided by declared slab height give physical floor index; the floor's display label is a separate field, because thirteen is skipped, ground is 0 in one city and 1 in another, and mezzanines exist.
@@ -72,7 +73,7 @@ Parts 1 to 5 carry only requirements without which two implementations would not
 Do not join the regional tileset, the site capture, and the interior scan into one continuous model. They differ in time, resolution, accuracy, vendor, and license, and joining them reconciles errors that resist reconciliation while costing the most at exactly the moment the user is moving. Resolve one identity down its hierarchy and hand off between representations instead.
 
 - **One representation in view at a time.** Regional tiles at altitude, site capture at the perimeter, a single space's scan inside. Prefetch the next rung of the ladder (18.2) so the handoff has no load stall.
-- **Obtain or compute registration externally before ingestion.** Store the externally computed interior-to-exterior transform, residual, and tier (7.8) as provenance. At runtime a client reads a cached transform; the candidate draft/client must not re-register live geometry.
+- **Obtain or compute registration externally before ingestion.** Store the externally computed interior-to-exterior transform, residual, and tier (7.8) as provenance. At runtime a client reads a cached transform; the resolver records the result rather than re-registering live geometry.
 - **Let the continuity anchor carry the cut.** Place the outgoing and incoming cameras relative to the anchor entity (18.3). Because the anchor is one identity with a pose in each representation, the fade lands on the same point. An opening is the ideal anchor between an exterior facade and an interior scan. This is what makes the leap feel like moving through the door rather than cutting to a slideshow.
 - **Match the tier to the task.** Navigation and transitions run on logical or navigational registration; measurement and fit require metric (18.4). Ship the fluid experience before every unit is survey-registered, deferring the expensive solve until someone needs to measure.
 - **Resolve to the freshest representation.** Follow `supersedes` and validity (7.9) so a stale interior is never shown as current unless history is requested.
@@ -110,10 +111,10 @@ Numbered for reference; none is required for conformance.
 18. Relation-type vocabulary beyond the six defined types, and whether an event ontology is warranted beyond events as entities; both are candidates for the taxonomy rather than the core.
 19. Assured-profile mappings for specific classification and releasability regimes, maintained outside this family.
 2. Foveated per-entity fidelity within one subscription, joining visibility hints to fan-out.
-3. Multi-anchor graphs with well-formedness and disagreement resolution, once concrete drivers exist.
+3. Multi-parent composition graphs with well-formedness and disagreement resolution. Multiple external registrations are already supported without adding composition parents (7.3).
 4. Reference pseudonymization scheme (k-anonymity cohorts, rotating pseudonyms, attribute-based credentials).
 5. Disclosure and place-policy language, most likely an existing one (XACML, OPA Rego).
-6. DGGS variant mandation or a translation layer, following standards-body engagement.
+6. For 2.5 review: the larger identifier/grid decision, including whether a grid belongs in future identifier forms, defaulting to non-spatial names, home-token discovery, DGGS variant mandation, and translation. Version 2.4 preserves legacy IDs and adds `id`; it does not settle that redesign.
 7. Standards-body track: OGC extension, joint OGC and Khronos item, independent, or permissively licensed. This decision shapes the others.
 8. Semantic taxonomy and affordance vocabulary; discrete-state semantics; many-to-one and one-to-many views.
 9. Normative definition of the `oct` grid and criteria for other synthetic grids.
@@ -126,9 +127,9 @@ Numbered for reference; none is required for conformance.
 16. Layer governance and registration; minting economics; cross-zone atomic structural updates.
 17. Rigs for articulated proxies; portal rendering and audio; licensing references on views.
 
-## G.12 Encoding Standard and reference implementation
+## G.12 Encoding working draft and reference implementation
 
-Wire formats (JSON Schema, a binary form, and API surface) are deferred to a companion Encoding Standard produced with the reference implementation, which will fix serialization, ship executable versions of every Annex A test, provide reference conversions for GeoPose, Moving Features, VDA 5050, OpenXR, and glTF, and be published under Apache 2.0. Maintenance follows the outcome of G.11 item 7.
+The [versioned 2.4 encoding document](../encoding/2.4.md), dated November 3, 2026, describes the JSON Schema 2020-12 records and informative OpenAPI 3.1 binding present in this repository. These are partial bindings, not a complete executable conformance suite. Schema checks cover record shapes and selected constraints, not entropy, identity decisions, tree traversal, authority, authentication, or lifecycle behavior. Binary encoding, signature formats, adapters, and complete functional tests remain future work; external implementation repositories must state their own supported specification version and coverage.
 
 ## G.13 Agent pattern and developer package
 
@@ -136,7 +137,7 @@ Wire formats (JSON Schema, a binary form, and API surface) are deferred to a com
 
 Actuation stays outside this family (17.3); a tool acts *on* a 4D-ID. The loop an agent runs:
 
-1. **Identify.** Resolve exact external identifiers or submit externally generated candidate/grounding evidence to a resolver; a UI selection is not itself identity. `resolve` returns an accepted 4D-ID, candidate records, or a signed no-match result.
+1. **Identify.** Resolve exact external identifiers or submit externally generated candidate/grounding evidence to a resolver; a UI selection is not itself identity. `resolve` returns the bounded decision outcomes of 7.10. Reuse an acceptable existing ID; an incomplete or exhausted lookup never establishes no-match. Candidate records are evidence, not an identity decision.
 2. **Understand.** `context` returns a bounded envelope (10.6): class, labels, pose, affordances, relations, representations, provenance, constraints, all at a snapshot.
 3. **Reason.** Follow `get_relations` and `query_events` as needed; never load geometry unless a representation is required for the purpose.
 4. **Act.** Call a tool with the 4D-ID as the target (`inspect(door)`, `navigate_to(dock)`, `schedule(asset)`), scoped to the same snapshot and a policy scope.
@@ -147,7 +148,7 @@ Delegation between agents carries the target 4D-ID, the snapshot, the policy sco
 
 ### Developer package
 
-Evaluation can begin in an afternoon. The companion package currently includes JSON Schema for records in Parts 1 to 5, an OpenAPI 3.1 description of the Clause 10 operations, a JavaScript SDK, a containerized candidate-recording/resolution service, conformance diagnostics, and sample data. Exactly 15 schema-level checks currently pass; broader functional conformance work continues. The IFC adapter is implemented; ROS 2 tf2, VDA 5050, glTF, 3D Tiles, OpenXR, major-engine adapters, MCP, and other SDKs remain planned unless their repositories say otherwise. These are external tools and clients consuming 4D-ID; the family does not provide a perception, matching, localization, registration, or rendering stack. The first experience should be four calls:
+This repository contains versioned JSON Schemas, an informative OpenAPI description, a manifest of exactly 112 normative tests, and artifact/shape validation. The manifest distinguishes wired partial schema checks from `todo` functional work; neither status claims full conformance. No pass count or implementation capability in a sibling repository is asserted here. SDKs, adapters, clients, and any reference resolver are external projects with their own coverage declarations. The family does not provide a perception, matching, localization, registration, or rendering stack. The first experience should be four calls:
 
 ```
 resolve(registry, id)      -> 4did:…

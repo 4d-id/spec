@@ -1,13 +1,13 @@
 # Contributing to the 4D-ID Specification
 
-Thank you for helping improve 4D-ID. The standard gets better through review from people who build real spatial systems.
+Thank you for helping improve 4D-ID. The working draft gets better through review from people who build real spatial systems.
 
 ## Ways to contribute
 
 - **Review and comment.** Read the draft (start with `parts/part1-core.md`) and open an issue for anything unclear, wrong, or missing.
 - **Propose a change.** Open an issue describing the problem before opening a pull request. Substantive changes need a rationale.
 - **Report an interoperability gap.** If two implementations could disagree because the spec is ambiguous, that is a bug in the spec. Tell us where.
-- **Contribute a test.** The conformance manifest defines the checks for this candidate draft. Better tests strengthen the proposal; current tooling has 15 schema-level checks passing while functional conformance work continues.
+- **Contribute a test.** The conformance manifest defines the checks for this working draft. Better tests strengthen the proposal; the 2.4 manifest defines 112 normative tests, while wired schema checks cover only part of their requirements and functional work remains `todo`. Run the validation command in README before submitting changes.
 
 ## The one rule
 

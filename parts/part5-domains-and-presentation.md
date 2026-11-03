@@ -1,13 +1,13 @@
-# 4D-ID 2.3, Part 5: Domains, portals, proxies, and presentation
+# 4D-ID 2.4, Part 5: Domains, portals, proxies, and presentation
 
-**Unified Spatiotemporal Identity for Shared Reality. Candidate Open Standard Working Draft, Part 5 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Working draft offered for community review, Part 5 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
-| Version | 2.3 (working draft) |
-| Date | September 2026 |
-| Status | Candidate open standard working draft, offered for community review. Not adopted by any standards body. |
+| Version | 2.4 (working draft) |
+| Date | November 3, 2026 |
+| Status | Working draft offered for community review. Not adopted by any standards body. |
 
 ## Abstract
 

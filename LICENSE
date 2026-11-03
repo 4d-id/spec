@@ -12,7 +12,7 @@ Version 2.0:
     https://www.apache.org/licenses/LICENSE-2.0
 
 The 4D-ID identifier is self-minting and permissionless: anyone may create a
-valid 4D-ID with no registry, no gatekeeper, and no fee. The standard is
+valid 4D-ID with no registry, no gatekeeper, and no fee. The working draft is
 intended to be royalty-free.
 
 Copyright 2026 Quantum Studio and the 4D-ID contributors.

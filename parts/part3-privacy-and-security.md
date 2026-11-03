@@ -1,23 +1,25 @@
-# 4D-ID 2.3, Part 3: Privacy and security
+# 4D-ID 2.4, Part 3: Privacy and security
 
-**Unified Spatiotemporal Identity for Shared Reality. Candidate Open Standard Working Draft, Part 3 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Working draft offered for community review, Part 3 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
-| Version | 2.3 (working draft) |
-| Date | September 2026 |
-| Status | Candidate open standard working draft, offered for community review. Not adopted by any standards body. |
+| Version | 2.4 (working draft) |
+| Date | November 3, 2026 |
+| Status | Working draft offered for community review. Not adopted by any standards body. |
 
 ## Abstract
 
-A pose stream with history and prediction is a surveillance system unless the standard says otherwise, and a fabric consulted by things that move needs requirements rather than considerations. This Part specifies pseudonyms, scoped disclosure, retention, consent, and place policy, and the security class: authenticated operations, signed fabric, disclosure inheritance, erasure, audit, and, for the assured profile, policy-neutral labels and authenticated dynamic state.
+A pose stream with history and prediction is a surveillance system unless the draft requires otherwise, and a fabric consulted by things that move needs requirements rather than considerations. This Part specifies pseudonyms, scoped disclosure, retention, consent, and place policy, and the security class: authenticated operations, signed fabric, disclosure inheritance, erasure, audit, and, for the assured profile, policy-neutral labels and authenticated dynamic state.
 
 ## Conformance
 
 This Part defines the requirements classes `privacy` and `security`. Conformance, profiles, normative references, terms, and conventions are in Part 1. Numbering is unique across the family (Part 1, 5.5). `security` 12.1 is required by every profile; other subclauses bind to the classes they name.
 
 ---
+
+The non-spatial `id` mode (7.2) avoids embedding minting place or time in new identifiers. It does not replace consent, access controls, pseudonyms, or protection against linkability; legacy spatial identifiers remain valid and may retain sensitive minting metadata. Authority attribution fields are not proof; deployments select authentication and authorization mechanisms under Clause 12 and evaluate scoped grants and disputes under 14.4.
 
 ## 11. Privacy (requirements class: `privacy`)
 

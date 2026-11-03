@@ -1,13 +1,13 @@
-# 4D-ID 2.3, Part 2: Extensions and queries
+# 4D-ID 2.4, Part 2: Extensions and queries
 
-**Unified Spatiotemporal Identity for Shared Reality. Candidate Open Standard Working Draft, Part 2 of 6.**
+**Unified Spatiotemporal Identity for Shared Reality. Working draft offered for community review, Part 2 of 6.**
 
 | | |
 |---|---|
 | Editors | D. Lorenzini and N. Lorenzini, Quantum Studio |
-| Version | 2.3 (working draft) |
-| Date | September 2026 |
-| Status | Candidate open standard working draft, offered for community review. Not adopted by any standards body. |
+| Version | 2.4 (working draft) |
+| Date | November 3, 2026 |
+| Status | Working draft offered for community review. Not adopted by any standards body. |
 
 ## Abstract
 
@@ -72,7 +72,7 @@ A client that holds a 4D-ID needs a small, fixed set of operations whose meaning
 
 > **/req/query/operations**
 > An implementation SHALL provide the following operations with the stated semantics, over at least one documented binding:
-> - `resolve(registry, external_id)` or `resolve(4did)`: the accepted existing 4D-ID and its current locator (14.1), or a signed negative. Resolve SHALL not silently mint, perceive, localize, match, re-identify/SEGS, or register; external candidate evidence is handled by lifecycle-specific services and policy.
+> - `resolve(registry, external_id)` or `resolve(4did)`: the accepted existing 4D-ID and its current locator (14.1), or a signed, scoped and expiring negative only for completed lookup. Responses SHALL distinguish the five outcomes of 7.10 and retain the bounded decision metadata; incomplete or exhausted lookup is not a no-match. Resolve SHALL NOT silently mint, perceive, localize, match, re-identify/SEGS, or register; external candidate evidence is handled by lifecycle-specific services and policy.
 > - `get_entity(4did)`: stable metadata (parent, motion mode, status, labels, layer, lease, semantics, relation summary).
 > - `get_state(4did, at?)`: the current 4D-State, or the state at a past instant within retention where `history` is claimed.
 > - `get_relations(4did, type?, direction?, at?, min_confidence?, depth?)`: relations (7.9) with validity, confidence, and provenance.

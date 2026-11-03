@@ -1,19 +1,27 @@
 openapi: 3.1.0
 info:
   title: 4D-ID Access API
-  version: "2.3"
+  version: "2.4"
+  x-spec-date: "2026-11-03"
+  x-status: working draft offered for community review
   description: >
-    The REST binding of the Clause 10 access operations (Part 2, 10.1).
+    Partial, informative REST binding of the Clause 10 access operations (Part 2, 10.1),
+    dated November 3, 2026. Binding status and limits are recorded in encoding/2.4.md.
     One semantic API, many bindings: these operations have the same meaning
     over REST, gRPC, MCP, an agent-to-agent task, a ROS service, or an engine
     plugin. This document is the REST binding; it is not normative. Callers
     supply identity records, grounding, state, and evidence; these operations
     do not perform perception, matching, localization, registration, or rendering.
+    OBSERVE -> GROUND -> IDENTIFY -> RESOLVE -> INTEROPERATE separates evidence,
+    external grounding and localization, identity continuity, and downstream use.
+    Authority fields are attribution only; authentication and authorization remain
+    deployment policy under Clause 12 and Part 4, 14.4. No security scheme or
+    signature serialization is specified by this partial binding.
   license:
     name: Apache-2.0
     identifier: Apache-2.0
 servers:
-  - url: https://example.org/4did/v2.3
+  - url: https://example.org/4did/v2.4
 tags:
   - name: access
     description: Clause 10 operations
@@ -38,8 +46,48 @@ paths:
                   id: { $ref: "#/components/schemas/fourdid" }
                   locator: { type: string }
                   snapshot_id: { type: string }
-                required: [id, locator, snapshot_id]
-        "404": { description: Signed negative. }
+                  decision:
+                    allOf:
+                      - { $ref: "#/components/schemas/reconciliation" }
+                      - properties:
+                          outcome: { const: reuse }
+                required: [id, locator, snapshot_id, decision]
+        "404":
+          description: Completed, scoped no acceptable match, with decision expiry. Requires a signed negative under Clause 10; signature serialization is not defined here. Does not authorize minting on its own.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: "#/components/schemas/reconciliation" }
+                  - properties:
+                      outcome: { const: no_acceptable_match }
+        "409":
+          description: Ambiguous evidence or conflicting identity/authority assertions; no automatic mutation.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: "#/components/schemas/reconciliation" }
+                  - properties:
+                      outcome: { enum: [ambiguous, conflict] }
+        "403":
+          description: Rejected by deployment policy; not a no-match.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: "#/components/schemas/reconciliation" }
+                  - properties:
+                      outcome: { const: rejected }
+        "503":
+          description: Lookup unavailable, incomplete, truncated or budget exhausted; never a no-match. The decision records the limitation and expiry.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: "#/components/schemas/reconciliation" }
+                  - properties:
+                      outcome: { enum: [ambiguous, conflict, rejected] }
   /entity/{id}:
     get:
       operationId: get_entity
@@ -218,6 +266,8 @@ components:
     fourdid: { $ref: "../schemas/common.json#/$defs/fourdid" }
     uncertainty: { $ref: "../schemas/common.json#/$defs/uncertainty" }
     relation: { $ref: "../schemas/common.json#/$defs/relation" }
+    registration: { $ref: "../schemas/common.json#/$defs/registration" }
+    reconciliation: { $ref: "../schemas/reconciliation.json" }
     state: { $ref: "../schemas/state.json" }
     snapshot: { $ref: "../schemas/snapshot.json" }
     envelope: { $ref: "../schemas/envelope.json" }
